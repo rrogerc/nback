@@ -1,8 +1,3 @@
-import { AuthContextInterface } from "../context/AuthContext";
-import jwt_decode from "jwt-decode";
-
-export const urlAPI: string = "https://dualn-back.com/api/";
-
 // Get Score
 // const getAlternativeScore = (TP, TN, FP, FN) => (((TP + TN) / (TP + TN + FP + FN)) * 100).toFixed(2);
 export const getScore = (TP: number, FP: number, FN: number) =>
@@ -30,45 +25,6 @@ export const prettyDate = (a: string) => {
   return h;
 };
 
-export const logOut = (authCtx: AuthContextInterface) => {
-  localStorage.removeItem("data");
-  authCtx?.setUser({
-    username: "",
-    email: "",
-    joined: "",
-    tokens: {
-      refresh: "",
-      access: "",
-    },
-  });
-};
-
-export const refreshToken = async (authCtx: AuthContextInterface) => {
-  const response = await fetch(urlAPI + "token/refresh/", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ refresh: authCtx?.user.tokens.refresh }),
-  });
-
-  const responseData = await response.json();
-
-  if (!response.ok) {
-    logOut(authCtx);
-    return { refreshed: false };
-  } else {
-    authCtx?.setUser((prevState) => {
-      const newState = { ...prevState };
-      newState.tokens.access = responseData.access;
-      localStorage.setItem("data", JSON.stringify(newState));
-      return newState;
-    });
-
-    return { refreshed: true };
-  }
-};
-
 export const colorScheme = () => {
   return {
     colorScheme:
@@ -77,20 +33,4 @@ export const colorScheme = () => {
         ? "light"
         : "dark",
   };
-};
-
-export const getRefreshTokenObj = () => {
-  if (localStorage.getItem("data")) {
-    const tokenObj: {
-      exp: number;
-      iat: number;
-      jti: string;
-      token_type: string;
-      user_id: number;
-    } = jwt_decode(JSON.parse(localStorage.getItem("data")!).tokens.refresh);
-
-    return tokenObj;
-  }
-
-  return null;
 };

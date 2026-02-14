@@ -4,7 +4,6 @@ import React, {
   useState,
   Dispatch,
   SetStateAction,
-  useContext,
 } from "react";
 
 import h from "../../../assets/sounds/h.wav";
@@ -20,13 +19,7 @@ import Trials from "./Trials/Trials";
 import Panel from "./Panel/Panel";
 import Keys from "./Keys/Keys";
 import Practice from "./Practice/Practice";
-import AuthContext from "../../../context/AuthContext";
-import {
-  urlAPI,
-  refreshToken,
-  getScore,
-  randomInt,
-} from "../../../utils/utils";
+import { getScore, randomInt } from "../../../utils/utils";
 
 const Board: React.FC<{
   game: {
@@ -80,7 +73,6 @@ const Board: React.FC<{
     };
   }, []);
 
-  const authCtx = useContext(AuthContext);
   const [spatialPlace, setSpatialPlace] = useState<number>(0);
   const [spatialPressed, setSpatialPressed] = useState<boolean>(false);
   const [spatialMatch, setSpatialMatch] = useState<boolean>(false);
@@ -124,7 +116,7 @@ const Board: React.FC<{
     };
 
     // Stop Game Function
-    const stopGame = async (
+    const stopGame = (
       trials: number,
       spatialObj: {
         TP: number;
@@ -163,31 +155,6 @@ const Board: React.FC<{
       };
 
       setScore(scoreData);
-
-      if (
-        !game.practice &&
-        trials >= game.task * 20 &&
-        Boolean(authCtx?.user.username)
-      ) {
-        const result = await fetch(urlAPI + "score/", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + authCtx?.user.tokens.access,
-          },
-          body: JSON.stringify(scoreData),
-        });
-
-        // const data = await result.json();
-
-        if (!result.ok) {
-          const { refreshed } = await refreshToken(authCtx!);
-          if (refreshed) {
-            stopGame(trials, spatialObj, auditoryObj);
-            return;
-          }
-        }
-      }
 
       if (game.practice)
         setPractice({
@@ -345,7 +312,6 @@ const Board: React.FC<{
     setGame,
     setScore,
     sounds,
-    authCtx,
   ]);
 
   return (
