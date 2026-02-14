@@ -1,0 +1,55 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+
+  padding: 2rem;
+}
+
+.row-1,
+.row-2,
+.row-3 {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.circle {
+  width: 7rem;
+  height: 7rem;
+  border: 0.2rem solid var(--main-color);
+  border-radius: 50%;
+  flex: 1;
+}
+
+.fill {
+  background-color: var(--yellow);
+}
+
+.circle-middle {
+  border: 0.2rem solid var(--main-color);
+}
+
+/* Corner wrappers for rounded panel edges */
+.bottom-right {
+  overflow: hidden;
+  border-radius: 0 0 2rem 0;
+}
+
+.bottom-left {
+  overflow: hidden;
+  border-radius: 0 0 0 2rem;
+}
+
+.upper-right {
+  overflow: hidden;
+  border-radius: 0 2rem 0 0;
+}
+
+.upper-left {
+  overflow: hidden;
+  border-radius: 2rem 0 0 0;
+}

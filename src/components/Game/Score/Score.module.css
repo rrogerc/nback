@@ -1,0 +1,24 @@
+/* SCORE */
+
+@media only screen and (max-width: 79em) {
+  .score {
+    grid-column: 1 / -1;
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.blink {
+  animation: blinker 1s linear 10;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 0;
+  }
+}

@@ -2,7 +2,7 @@
 node_modules/
 
 # Build output
-front-end/build/
+/build
 
 # Environment
 .env

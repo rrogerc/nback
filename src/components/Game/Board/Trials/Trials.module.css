@@ -1,0 +1,45 @@
+.game {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.trials-counter {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.red-dot {
+  height: 0.7rem;
+  width: 0.7rem;
+  background-color: var(--red);
+  border-radius: 50%;
+  display: inline-block;
+
+  box-shadow: 0 0 2rem var(--red), 0 0 3rem var(--red), 0 0 4rem var(--red),
+    0 0 5rem var(--red);
+}
+
+.green-dot {
+  height: 0.7rem;
+  width: 0.7rem;
+  background-color: var(--green);
+  border-radius: 50%;
+  display: inline-block;
+
+  box-shadow: 0 0 2rem var(--green), 0 0 3rem var(--green),
+    0 0 4rem var(--green), 0 0 5rem var(--green);
+}
+
+.trials {
+  font-weight: bold;
+  font-size: 2.2rem;
+}
+
+.input {
+  width: 5rem;
+  text-align: center;
+}
