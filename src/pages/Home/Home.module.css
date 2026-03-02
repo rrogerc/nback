@@ -1,0 +1,133 @@
+.home {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3rem;
+  padding: 4rem 2rem;
+}
+
+.title {
+  font-size: 4.8rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.settings {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  align-items: center;
+}
+
+.setting {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.label {
+  font-size: 2rem;
+  font-weight: 600;
+  min-width: 14rem;
+  text-align: right;
+}
+
+.selector {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.value {
+  font-size: 3.2rem;
+  font-weight: 700;
+  min-width: 4rem;
+  text-align: center;
+}
+
+.up {
+  width: 0;
+  height: 0;
+  border-left: 1.2rem solid transparent;
+  border-right: 1.2rem solid transparent;
+  border-bottom: 2rem solid var(--main-color);
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.up:hover {
+  opacity: 0.7;
+}
+
+.down {
+  width: 0;
+  height: 0;
+  border-left: 1.2rem solid transparent;
+  border-right: 1.2rem solid transparent;
+  border-top: 2rem solid var(--main-color);
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.down:hover {
+  opacity: 0.7;
+}
+
+.input {
+  width: 7rem;
+  text-align: center;
+  font-size: 2.6rem;
+  font-weight: 600;
+  font-family: inherit;
+  background-color: transparent;
+  color: var(--main-color);
+  border: none;
+  border-bottom: 0.2rem solid var(--main-color);
+  outline: none;
+  transition: border-color 0.15s ease;
+  -moz-appearance: textfield;
+}
+
+.input::-webkit-outer-spin-button,
+.input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.input:focus {
+  border-bottom-color: var(--yellow);
+}
+
+.start {
+  font-size: 2.2rem;
+  padding: 1.4rem 5rem;
+}
+
+.theme {
+  position: absolute;
+  top: 2.5rem;
+  right: 4rem;
+}
+
+@media only screen and (max-width: 39.75em) {
+  .title {
+    font-size: 3.6rem;
+  }
+
+  .setting {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .label {
+    text-align: center;
+    min-width: auto;
+  }
+
+  .theme {
+    top: 1.5rem;
+    right: 2rem;
+  }
+}

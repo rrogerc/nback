@@ -14,19 +14,14 @@ const Task: React.FC<{
   setGame: Dispatch<
     SetStateAction<{
       active: boolean;
-      practice: boolean;
       task: number;
       trials: number;
     }>
   >;
 }> = ({ activeGame, task, setGame }) => {
   const [startPressed, setStartPressed] = useState<boolean>(false);
-  const [practicePressed, setPracticePressed] = useState<boolean>(false);
-  const [showPracticeMessage, setShowPracticeMessage] =
-    useState<boolean>(false);
 
-  const startGame = useCallback(() => {
-    setShowPracticeMessage(false);
+  const toggleGame = useCallback(() => {
     if (!activeGame)
       setGame((prevGame) => {
         return {
@@ -34,22 +29,14 @@ const Task: React.FC<{
           active: true,
         };
       });
+    else
+      setGame((prevGame) => {
+        return {
+          ...prevGame,
+          active: false,
+        };
+      });
   }, [activeGame, setGame]);
-
-  const practiceGame = useCallback(() => {
-    setShowPracticeMessage(false);
-    if (!activeGame) {
-      if (task < 13)
-        setGame((prevGame) => {
-          return {
-            ...prevGame,
-            active: true,
-            practice: true,
-          };
-        });
-      else setShowPracticeMessage(true);
-    }
-  }, [activeGame, setGame, task]);
 
   const upTask = (e: React.MouseEvent<HTMLDivElement>) => {
     (e.target as HTMLElement).style.borderBottomColor = "var(--main-bg-color)";
@@ -88,15 +75,9 @@ const Task: React.FC<{
     const keyHandler = (e: KeyboardEvent) => {
       if (e.type === "keypress" && e.code === "KeyS") {
         setStartPressed(true);
-        startGame();
+        toggleGame();
       } else if (e.type === "keyup" && e.code === "KeyS")
         setStartPressed(false);
-
-      if (e.type === "keypress" && e.code === "KeyP") {
-        setPracticePressed(true);
-        practiceGame();
-      } else if (e.type === "keyup" && e.code === "KeyP")
-        setPracticePressed(false);
     };
 
     window.addEventListener("keypress", keyHandler);
@@ -106,7 +87,7 @@ const Task: React.FC<{
       window.removeEventListener("keypress", keyHandler);
       window.removeEventListener("keyup", keyHandler);
     };
-  }, [startGame, practiceGame]);
+  }, [toggleGame]);
 
   return (
     <div className={classes["task"]}>
@@ -129,27 +110,12 @@ const Task: React.FC<{
       <div className={classes["play"]}>
         <button
           id="KeyS"
-          onClick={startGame}
+          onClick={toggleGame}
           onMouseDown={() => setStartPressed(true)}
           onMouseUp={() => setStartPressed(false)}
           className={startPressed ? "button-active" : ""}
         >
-          KeyS: Start
-        </button>
-        <button
-          id="KeyP"
-          onClick={practiceGame}
-          onMouseDown={() => setPracticePressed(true)}
-          onMouseUp={() => setPracticePressed(false)}
-          className={practicePressed ? "button-active" : ""}
-        >
-          KeyP: Practice
-          {showPracticeMessage && (
-            <span className={classes["red"]}>
-              <br />
-              Max: 12-Back
-            </span>
-          )}
+          KeyS: {activeGame ? "Stop" : "Start"}
         </button>
       </div>
     </div>

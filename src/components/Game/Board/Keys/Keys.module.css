@@ -2,8 +2,17 @@
   display: flex;
   align-items: center;
   justify-content: space-around;
-  margin-top: 1rem;
-  margin-bottom: 1.5rem;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  gap: 2rem;
+}
+
+.keys button {
+  flex: 1;
+  padding: 1.6rem 2rem;
+  font-size: 1.8rem;
+  font-weight: 600;
+  letter-spacing: 0.03rem;
 }
 
 .transparent {
@@ -13,10 +22,12 @@
 
 .green {
   background-color: var(--green);
+  border-color: var(--green);
 }
 
 .red {
   background-color: var(--red);
+  border-color: var(--red);
 }
 
 .blink {

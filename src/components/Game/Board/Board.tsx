@@ -25,14 +25,12 @@ const SPEED = 3000; // ms per interval
 const Board: React.FC<{
   game: {
     active: boolean;
-    practice: boolean;
     task: number;
     trials: number;
   };
   setGame: Dispatch<
     SetStateAction<{
       active: boolean;
-      practice: boolean;
       task: number;
       trials: number;
     }>
@@ -87,7 +85,8 @@ const Board: React.FC<{
   const [elapsedTime, setElapsedTime] = useState<number>(0);
 
   useEffect(() => {
-    let interval: NodeJS.Timer;
+    let interval: ReturnType<typeof setInterval>;
+    let timerInterval: ReturnType<typeof setInterval>;
     let trialsCounterInterval: number = 0;
     let startTime: number = 0;
 
@@ -157,7 +156,7 @@ const Board: React.FC<{
       setScore(scoreData);
 
       setGame((prevGame) => {
-        return { ...prevGame, active: false, practice: false };
+        return { ...prevGame, active: false };
       });
     };
 
@@ -172,10 +171,6 @@ const Board: React.FC<{
           setAuditoryPressed(true);
         }
       } else if (type === "keyup" || type === "mouseup") {
-        if (code === "KeyQ") {
-          if (game.active)
-            stopGame(trialsCounterInterval, spatialObj, auditoryObj);
-        }
         if (code === "KeyA" || (button === 0 && code === "game"))
           setSpatialPressed(false);
 
@@ -215,11 +210,43 @@ const Board: React.FC<{
 
     if (game.active) {
       startTime = Date.now();
+      // Clear previous score
+      setScore({
+        nback: game.task,
+        trials: 0,
+        spatialScore: 0,
+        auditoryScore: 0,
+        totalScore: 0,
+        speed: SPEED / 1000,
+        elapsedTime: 0,
+        spatialObj: { TP: 0, TN: 0, FP: 0, FN: 0 },
+        auditoryObj: { TP: 0, TN: 0, FP: 0, FN: 0 },
+      });
+      timerInterval = setInterval(() => {
+        const elapsed = Date.now() - startTime;
+        setElapsedTime(elapsed);
+        setScore((prev) => ({ ...prev, elapsedTime: elapsed }));
+      }, 100);
       interval = setInterval(() => {
         if (trialsCounterInterval > 0) {
           // Update Sensitivity & Specificity (TP, TN, FP, FN)
           updateScore(spatialMatchInterval, spatialInput, spatialObj);
           updateScore(auditoryMatchInterval, auditoryInput, auditoryObj);
+
+          // Update live score
+          const liveSpatial = getScore(spatialObj.TP, spatialObj.FP, spatialObj.FN);
+          const liveAuditory = getScore(auditoryObj.TP, auditoryObj.FP, auditoryObj.FN);
+          setScore({
+            nback: game.task,
+            trials: trialsCounterInterval,
+            spatialScore: liveSpatial,
+            auditoryScore: liveAuditory,
+            totalScore: Number(((liveSpatial + liveAuditory) / 2).toFixed(2)),
+            speed: SPEED / 1000,
+            elapsedTime: Date.now() - startTime,
+            spatialObj: { ...spatialObj },
+            auditoryObj: { ...auditoryObj },
+          });
         }
 
         [
@@ -230,7 +257,7 @@ const Board: React.FC<{
         ] = [false, false, false, false];
 
         // Stop the game if the number of trials is reached
-        if (trialsCounterInterval >= game.trials || !game.active)
+        if (trialsCounterInterval >= game.trials)
           stopGame(trialsCounterInterval, spatialObj, auditoryObj);
         else {
           const spatialRandomPlace = randomInt(1, 8);
@@ -264,9 +291,6 @@ const Board: React.FC<{
           trialsCounterInterval++;
           setTrialsCounter(trialsCounterInterval);
 
-          // Update elapsed time
-          setElapsedTime(Date.now() - startTime);
-
           // Remove Spatial Stimuli after half the interval
           setTimeout(() => setSpatialPlace(0), SPEED / 2);
         }
@@ -291,13 +315,16 @@ const Board: React.FC<{
         e.preventDefault()
       );
 
-      clearInterval(interval);
+      if (interval) {
+        stopGame(trialsCounterInterval, spatialObj, auditoryObj);
+        clearInterval(interval);
+        clearInterval(timerInterval);
+      }
     };
   }, [
     game.active,
     game.task,
     game.trials,
-    game.practice,
     setGame,
     setScore,
     sounds,
@@ -316,7 +343,6 @@ const Board: React.FC<{
       <Panel activeGame={game.active} spatialPlace={spatialPlace} />
       <Keys
         activeGame={game.active}
-        practiceGame={game.practice}
         spatialPressed={spatialPressed}
         spatialMatch={spatialMatch}
         auditoryPressed={auditoryPressed}

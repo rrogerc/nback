@@ -1,22 +1,22 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 import classes from "./Game.module.css";
 
-import Task from "./Task/Task";
 import Board from "./Board/Board";
 import Score from "./Score/Score";
 
-const Game: React.FC = () => {
+const Game: React.FC<{
+  autoStart?: boolean;
+  onGameEnd?: () => void;
+}> = ({ autoStart = false, onGameEnd }) => {
   const [game, setGame] = useState<{
     active: boolean;
-    practice: boolean;
     task: number;
     trials: number;
   }>({
     active: false,
-    practice: false,
-    task: 2,
-    trials: 40,
+    task: Number(localStorage.getItem("task")) || 2,
+    trials: Number(localStorage.getItem("trials")) || 40,
   });
 
   const [score, setScore] = useState<{
@@ -61,24 +61,46 @@ const Game: React.FC = () => {
     },
   });
 
+  // Auto-start on mount
+  const hasStarted = useRef(false);
   useEffect(() => {
-    if (localStorage.getItem("task"))
-      setGame((prevState) => {
-        return { ...prevState, task: Number(localStorage.getItem("task")) };
-      });
-
-    if (localStorage.getItem("trials"))
-      setGame((prevState) => {
-        return { ...prevState, trials: Number(localStorage.getItem("trials")) };
-      });
-  }, []);
+    if (autoStart && !hasStarted.current) {
+      hasStarted.current = true;
+      setGame((prev) => ({ ...prev, active: true }));
+    }
+  }, [autoStart]);
 
   return (
-    <main id="game" className={classes["game"]}>
-      <Task activeGame={game.active} task={game.task} setGame={setGame} />
-      <Board game={game} setGame={setGame} setScore={setScore} />
-      <Score score={score} />
-    </main>
+    <>
+      {game.active && onGameEnd && (
+        <div className={classes["back-row"]}>
+          <button className={classes["back"]} onClick={onGameEnd}>
+            &#8592; Back
+          </button>
+        </div>
+      )}
+      <main id="game" className={classes["game"]}>
+        {game.active ? (
+          <>
+            <Board game={game} setGame={setGame} setScore={setScore} />
+            <Score score={score} />
+          </>
+        ) : (
+        <div className={classes["results"]}>
+          {score.trials > 0 && (
+            <>
+              <Score score={score} />
+              {onGameEnd && (
+                <button className={classes["return"]} onClick={onGameEnd}>
+                  Return Home
+                </button>
+              )}
+            </>
+          )}
+        </div>
+      )}
+      </main>
+    </>
   );
 };
 

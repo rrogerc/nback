@@ -8,13 +8,13 @@ const Clock: React.FC<{
   speed: number;
 }> = ({ activeGame, elapsedTime, speed }) => {
   const formatTime = (ms: number) => {
+    const totalMs = ms % 1000;
     const totalSeconds = Math.floor(ms / 1000);
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
-    return `${hours}:${String(minutes).padStart(2, "0")}:${String(
-      seconds
-    ).padStart(2, "0")}`;
+    return `${minutes}:${String(seconds).padStart(2, "0")}.${String(
+      totalMs
+    ).padStart(3, "0")}`;
   };
 
   return (

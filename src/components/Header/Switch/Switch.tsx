@@ -12,7 +12,7 @@ const Switch: React.FC = () => {
       localStorage.setItem("light", "1");
     } else {
       document.documentElement.style.setProperty("--main-bg-color", "#1f2329");
-      document.documentElement.style.setProperty("--main-color", "#bdbec0");
+      document.documentElement.style.setProperty("--main-color", "#e0e2e7");
       localStorage.setItem("light", "0");
     }
   };

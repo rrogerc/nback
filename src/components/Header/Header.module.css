@@ -1,20 +1,15 @@
 .header {
-  display: grid;
-
-  grid-gap: 1rem;
-
-  grid-template-rows: 1fr;
-  grid-template-columns: 1fr 1fr;
-
-  justify-items: center;
+  display: flex;
+  justify-content: flex-start;
   align-items: center;
 
-  padding: 2rem;
+  padding: 2.5rem 4rem;
 }
 
 @media only screen and (max-width: 33.25em) {
   .header {
     grid-template-rows: 1fr 1fr;
     grid-template-columns: 1fr 1fr;
+    padding: 2rem;
   }
 }

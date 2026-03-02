@@ -4,46 +4,58 @@
   margin: 2rem 0;
   align-items: center;
   justify-content: space-between;
+  gap: 3rem;
 }
 
 .arrows-task {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 2rem;
 }
 
 .arrows-task .up {
   width: 0;
   height: 0;
-  border-left: 1.5rem solid transparent;
-  border-right: 1.5rem solid transparent;
-  border-bottom: 3rem solid var(--main-color);
+  border-left: 2rem solid transparent;
+  border-right: 2rem solid transparent;
+  border-bottom: 3.5rem solid var(--main-color);
 
   cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.arrows-task .up:hover {
+  opacity: 0.7;
 }
 
 .arrows-task .down {
   width: 0;
   height: 0;
-  border-left: 1.5rem solid transparent;
-  border-right: 1.5rem solid transparent;
-  border-top: 3rem solid var(--main-color);
+  border-left: 2rem solid transparent;
+  border-right: 2rem solid transparent;
+  border-top: 3.5rem solid var(--main-color);
 
   cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.arrows-task .down:hover {
+  opacity: 0.7;
 }
 
 .play {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 1rem;
 }
 
 .nback {
-  font-size: 2.2rem;
+  font-size: 3rem;
+  font-weight: 600;
 }
 
 .red {
-  font-size: 1.2rem;
-  font-weight: bold;
+  font-size: 1.4rem;
+  font-weight: 600;
   color: var(--red);
 }

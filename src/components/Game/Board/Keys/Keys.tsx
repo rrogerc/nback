@@ -4,7 +4,6 @@ import classes from "./Keys.module.css";
 
 const Keys: React.FC<{
   activeGame: boolean;
-  practiceGame: boolean;
   spatialPressed: boolean;
   spatialMatch: boolean;
   auditoryPressed: boolean;
@@ -21,8 +20,6 @@ const Keys: React.FC<{
               : props.spatialMatch
               ? classes["green"]
               : classes["red"]
-            : props.practiceGame && props.spatialMatch
-            ? classes["blink"]
             : classes["transparent"]
         }
       >
@@ -37,8 +34,6 @@ const Keys: React.FC<{
               : props.auditoryMatch
               ? classes["green"]
               : classes["red"]
-            : props.practiceGame && props.auditoryMatch
-            ? classes["blink"]
             : classes["transparent"]
         }
       >

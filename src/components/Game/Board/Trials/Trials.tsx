@@ -12,7 +12,6 @@ const Trials: React.FC<{
   setGame: Dispatch<
     SetStateAction<{
       active: boolean;
-      practice: boolean;
       task: number;
       trials: number;
     }>
