@@ -8,6 +8,20 @@
   --blue: #3b82f6;
 }
 
+/* System preference: light (only when no explicit theme is set) */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --main-bg-color: #e9e9ea;
+    --main-color: #383d43;
+  }
+}
+
+/* Explicit light override */
+:root[data-theme="light"] {
+  --main-bg-color: #e9e9ea;
+  --main-color: #383d43;
+}
+
 /* BASIC RESET */
 *,
 *::after,

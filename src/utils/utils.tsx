@@ -24,13 +24,3 @@ export const prettyDate = (a: string) => {
     b.toString().slice(0, 21);
   return h;
 };
-
-export const colorScheme = () => {
-  return {
-    colorScheme:
-      localStorage.getItem("light") &&
-      Boolean(Number(localStorage.getItem("light")))
-        ? "light"
-        : "dark",
-  };
-};
