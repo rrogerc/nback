@@ -63,7 +63,12 @@ const Board: React.FC<{
     }>
   >;
   onQuit?: () => void;
-}> = ({ game, setGame, setScore, onQuit }) => {
+  liveScore: {
+    spatialScore: number;
+    auditoryScore: number;
+    totalScore: number;
+  };
+}> = ({ game, setGame, setScore, onQuit, liveScore }) => {
   const sounds: {
     [key: number]: HTMLAudioElement;
   } = useMemo(() => {
@@ -247,16 +252,23 @@ const Board: React.FC<{
     const keyHandler = (e: KeyboardEvent) =>
       eventHandler(e.type, e.code, -1);
 
+    const resolveId = (el: HTMLElement): string =>
+      el.id || el.parentElement?.id || el.parentElement?.parentElement?.id || "";
+
     const clickHandler = (e: MouseEvent) =>
-      eventHandler(
-        e.type,
-        (e.target as HTMLInputElement).id
-          ? (e.target as HTMLInputElement).id
-          : (e.target as HTMLInputElement).parentElement!.id
-            ? (e.target as HTMLInputElement).parentElement!.id
-            : (e.target as HTMLInputElement).parentElement!.parentElement!.id,
-        e.button
-      );
+      eventHandler(e.type, resolveId(e.target as HTMLElement), e.button);
+
+    const touchHandler = (e: TouchEvent) => {
+      const id = resolveId(e.target as HTMLElement);
+      if (id === "KeyA" || id === "KeyL") {
+        e.preventDefault(); // prevent synthetic mousedown firing too
+        eventHandler(
+          e.type === "touchstart" ? "mousedown" : "mouseup",
+          id,
+          -1
+        );
+      }
+    };
 
     const updateScore = (
       match: boolean,
@@ -378,6 +390,8 @@ const Board: React.FC<{
 
     window.addEventListener("mousedown", clickHandler);
     window.addEventListener("mouseup", clickHandler);
+    window.addEventListener("touchstart", touchHandler, { passive: false });
+    window.addEventListener("touchend", touchHandler);
     window.addEventListener("keypress", keyHandler);
     window.addEventListener("keyup", keyHandler);
     window.addEventListener("contextmenu", (e: MouseEvent) =>
@@ -387,6 +401,8 @@ const Board: React.FC<{
     return () => {
       window.removeEventListener("mousedown", clickHandler);
       window.removeEventListener("mouseup", clickHandler);
+      window.removeEventListener("touchstart", touchHandler);
+      window.removeEventListener("touchend", touchHandler);
       window.removeEventListener("keypress", keyHandler);
       window.removeEventListener("keyup", keyHandler);
       window.removeEventListener("contextmenu", (e: MouseEvent) =>
@@ -484,6 +500,21 @@ const Board: React.FC<{
         auditoryPressed={auditoryPressed}
         auditoryMatch={auditoryMatch}
       />
+      {trialsCounter > 0 && (
+        <div className={classes["live-score"]}>
+          <span>
+            Spatial <span className="green">{liveScore.spatialScore}%</span>
+          </span>
+          <span className={classes["live-divider"]}>|</span>
+          <span>
+            Auditory <span className="green">{liveScore.auditoryScore}%</span>
+          </span>
+          <span className={classes["live-divider"]}>|</span>
+          <span>
+            Total <span className="yellow">{liveScore.totalScore}%</span>
+          </span>
+        </div>
+      )}
     </div>
   );
 };

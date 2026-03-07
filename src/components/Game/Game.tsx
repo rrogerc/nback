@@ -73,15 +73,13 @@ const Game: React.FC<{
   return (
     <main id="game" className={classes["game"]}>
       {game.active ? (
-        <>
-          <Board
-            game={game}
-            setGame={setGame}
-            setScore={setScore}
-            onQuit={onGameEnd}
-          />
-          <Score score={score} />
-        </>
+        <Board
+          game={game}
+          setGame={setGame}
+          setScore={setScore}
+          onQuit={onGameEnd}
+          liveScore={score}
+        />
       ) : (
         <div className={classes["results"]}>
           {score.trials > 0 && (

@@ -8,12 +8,17 @@
   border-radius: 0.6rem;
   letter-spacing: 0.1rem;
   line-height: 1;
-  opacity: 0.5;
+  opacity: 0.7;
   transition: opacity 0.15s ease;
 }
 
-.pause-toggle:hover {
-  opacity: 1;
+@media (hover: hover) {
+  .pause-toggle {
+    opacity: 0.5;
+  }
+  .pause-toggle:hover {
+    opacity: 1;
+  }
 }
 
 /* Fullscreen overlay */
@@ -58,11 +63,16 @@
 .pause-btn-quit {
   font-size: 1.8rem;
   padding: 1rem 3rem;
-  opacity: 0.6;
+  opacity: 0.8;
 }
 
-.pause-btn-quit:hover {
-  opacity: 1;
+@media (hover: hover) {
+  .pause-btn-quit {
+    opacity: 0.6;
+  }
+  .pause-btn-quit:hover {
+    opacity: 1;
+  }
 }
 
 .pause-hint {
@@ -76,4 +86,32 @@
   border-radius: 0.3rem;
   font-family: inherit;
   font-size: inherit;
+}
+
+.live-score {
+  display: flex;
+  justify-content: center;
+  gap: 1.2rem;
+  margin-top: 1.5rem;
+  font-size: 1.4rem;
+  font-weight: 600;
+  opacity: 0.6;
+}
+
+.live-divider {
+  opacity: 0.3;
+}
+
+@media only screen and (max-width: 39.75em) {
+  .pause-modal {
+    padding: 3rem 2.5rem;
+  }
+
+  .pause-title {
+    font-size: 2.8rem;
+  }
+
+  .pause-hint {
+    display: none;
+  }
 }
