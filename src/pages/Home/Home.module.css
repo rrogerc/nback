@@ -57,8 +57,10 @@
   transition: opacity 0.15s ease;
 }
 
-.up:hover {
-  opacity: 0.7;
+@media (hover: hover) {
+  .up:hover {
+    opacity: 0.7;
+  }
 }
 
 .down {
@@ -71,8 +73,10 @@
   transition: opacity 0.15s ease;
 }
 
-.down:hover {
-  opacity: 0.7;
+@media (hover: hover) {
+  .down:hover {
+    opacity: 0.7;
+  }
 }
 
 .input {

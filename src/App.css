@@ -47,14 +47,20 @@ button {
   border: 0.15rem solid var(--main-color);
   transition: background-color 0.15s ease, color 0.15s ease,
     border-color 0.15s ease, opacity 0.15s ease;
+
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
 }
 
 button:focus {
   outline: 0;
 }
 
-button:hover:not(#KeyA):not(#KeyL):not(:disabled) {
-  background-color: rgba(128, 128, 128, 0.1);
+@media (hover: hover) {
+  button:hover:not(#KeyA):not(#KeyL):not(:disabled) {
+    background-color: rgba(128, 128, 128, 0.1);
+  }
 }
 
 button:active:not(#KeyA):not(#KeyL),

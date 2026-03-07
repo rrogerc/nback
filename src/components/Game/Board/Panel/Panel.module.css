@@ -6,6 +6,10 @@
   justify-content: center;
 
   padding: 3rem;
+
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .row-1,

@@ -36,6 +36,10 @@ const Home: React.FC = () => {
   };
 
   const startGame = useCallback(() => {
+    // Unlock audio context on iOS (must happen in user gesture call stack)
+    const a = new Audio();
+    a.play().catch(() => {});
+    a.pause();
     navigate("/game");
   }, [navigate]);
 
