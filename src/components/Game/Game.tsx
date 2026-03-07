@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 
 import classes from "./Game.module.css";
 
@@ -70,6 +70,20 @@ const Game: React.FC<{
     }
   }, [autoStart]);
 
+  // Escape to go home on results screen
+  const showingResults = !game.active && score.trials > 0;
+  const handleEscape = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === "Escape" && onGameEnd) onGameEnd();
+    },
+    [onGameEnd]
+  );
+  useEffect(() => {
+    if (!showingResults) return;
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
+  }, [showingResults, handleEscape]);
+
   return (
     <main id="game" className={classes["game"]}>
       {game.active ? (
@@ -84,6 +98,14 @@ const Game: React.FC<{
         <div className={classes["results"]}>
           {score.trials > 0 && (
             <>
+              <div className={classes["headline"]}>
+                <span className={classes["headline-score"]}>
+                  {score.totalScore}%
+                </span>
+                <span className={classes["headline-label"]}>
+                  {score.nback}-Back Score
+                </span>
+              </div>
               <Score score={score} />
               {onGameEnd && (
                 <button className={classes["return"]} onClick={onGameEnd}>
