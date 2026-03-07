@@ -37,11 +37,10 @@ const Score: React.FC<{
     auditoryObj,
   },
 }) => {
-  const spatialTrials = spatialObj.TP + spatialObj.FN;
-  const auditoryTrials = auditoryObj.TP + auditoryObj.FN;
-  const falsePositives = auditoryObj.FP + spatialObj.FP;
-  const trueNegatives =
-    trials - (spatialTrials + auditoryTrials + falsePositives);
+  const spatialMatches = spatialObj.TP + spatialObj.FN;
+  const auditoryMatches = auditoryObj.TP + auditoryObj.FN;
+  const falsePositives = spatialObj.FP + auditoryObj.FP;
+  const trueNegatives = spatialObj.TN + auditoryObj.TN;
 
   const formatElapsed = (ms: number) => {
     const totalMs = ms % 1000;
@@ -78,14 +77,14 @@ const Score: React.FC<{
             <th>Spatial</th>
             <td className="green">{spatialObj.TP}</td>
             <td className="red">{spatialObj.FN}</td>
-            <td>{spatialTrials}</td>
+            <td>{spatialMatches}</td>
             <td className="green">{spatialScore}%</td>
           </tr>
           <tr>
             <th>Auditory</th>
             <td className="green">{auditoryObj.TP}</td>
             <td className="red">{auditoryObj.FN}</td>
-            <td>{auditoryTrials}</td>
+            <td>{auditoryMatches}</td>
             <td className="green">{auditoryScore}%</td>
           </tr>
           <tr>
