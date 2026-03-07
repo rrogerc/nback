@@ -4,9 +4,11 @@ import classes from "./Clock.module.css";
 
 const Clock: React.FC<{
   activeGame: boolean;
+  paused: boolean;
   elapsedTime: number;
   speed: number;
-}> = ({ activeGame, elapsedTime, speed }) => {
+  trialsCounter: number;
+}> = ({ activeGame, paused, elapsedTime, speed, trialsCounter }) => {
   const formatTime = (ms: number) => {
     const totalMs = ms % 1000;
     const totalSeconds = Math.floor(ms / 1000);
@@ -21,10 +23,14 @@ const Clock: React.FC<{
     <div className={classes["speed"]}>
       <div className={classes["clock"]}>
         <div
+          key={trialsCounter}
           className={`${classes["hour"]} ${
             activeGame ? classes["hour-spin"] : ""
           }`}
-          style={{ animationDuration: `${speed / 1000}s` }}
+          style={{
+            animationDuration: `${speed / 1000}s`,
+            animationPlayState: paused ? "paused" : "running",
+          }}
         >
           <div className={classes["white"]}></div>
           <div className={classes["dark"]}></div>

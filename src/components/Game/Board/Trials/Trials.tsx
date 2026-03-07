@@ -5,6 +5,7 @@ import Clock from "./Clock/Clock";
 
 const Trials: React.FC<{
   activeGame: boolean;
+  paused: boolean;
   trials: number;
   trialsCounter: number;
   elapsedTime: number;
@@ -39,8 +40,10 @@ const Trials: React.FC<{
     <div className={classes["game"]}>
       <Clock
         activeGame={props.activeGame}
+        paused={props.paused}
         elapsedTime={props.elapsedTime}
         speed={props.speed}
+        trialsCounter={props.trialsCounter}
       />
       <div className={classes["trials-counter"]}>
         <span

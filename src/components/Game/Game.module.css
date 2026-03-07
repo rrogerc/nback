@@ -13,15 +13,6 @@
   padding: 2rem 4rem;
 }
 
-.back-row {
-  padding: 2rem 4rem 0;
-}
-
-.back {
-  font-size: 1.6rem;
-  padding: 0.8rem 1.6rem;
-}
-
 .results {
   grid-column: 1 / -1;
   display: flex;

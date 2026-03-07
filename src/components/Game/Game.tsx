@@ -71,21 +71,18 @@ const Game: React.FC<{
   }, [autoStart]);
 
   return (
-    <>
-      {game.active && onGameEnd && (
-        <div className={classes["back-row"]}>
-          <button className={classes["back"]} onClick={onGameEnd}>
-            &#8592; Back
-          </button>
-        </div>
-      )}
-      <main id="game" className={classes["game"]}>
-        {game.active ? (
-          <>
-            <Board game={game} setGame={setGame} setScore={setScore} />
-            <Score score={score} />
-          </>
-        ) : (
+    <main id="game" className={classes["game"]}>
+      {game.active ? (
+        <>
+          <Board
+            game={game}
+            setGame={setGame}
+            setScore={setScore}
+            onQuit={onGameEnd}
+          />
+          <Score score={score} />
+        </>
+      ) : (
         <div className={classes["results"]}>
           {score.trials > 0 && (
             <>
@@ -99,8 +96,7 @@ const Game: React.FC<{
           )}
         </div>
       )}
-      </main>
-    </>
+    </main>
   );
 };
 
