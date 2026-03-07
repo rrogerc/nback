@@ -8,7 +8,7 @@ const Home: React.FC = () => {
   const [task, setTask] = useState(
     Number(localStorage.getItem("task")) || 2
   );
-  const [trials, setTrials] = useState(
+  const [trials, setTrials] = useState<number | string>(
     Number(localStorage.getItem("trials")) || 40
   );
 
@@ -29,8 +29,20 @@ const Home: React.FC = () => {
   };
 
   const changeTrials = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = +e.currentTarget.value;
-    const clamped = val > 999 ? 999 : val < 1 ? 1 : val;
+    const raw = e.currentTarget.value;
+    if (raw === "") {
+      setTrials("");
+      return;
+    }
+    const val = +raw;
+    const clamped = val > 999 ? 999 : val;
+    setTrials(clamped);
+    localStorage.setItem("trials", String(clamped));
+  };
+
+  const blurTrials = () => {
+    const val = Number(trials);
+    const clamped = val < 1 || isNaN(val) ? 1 : val;
     setTrials(clamped);
     localStorage.setItem("trials", String(clamped));
   };
@@ -77,6 +89,7 @@ const Home: React.FC = () => {
             max="999"
             value={trials}
             onChange={changeTrials}
+            onBlur={blurTrials}
             className={classes["input"]}
           />
         </div>
