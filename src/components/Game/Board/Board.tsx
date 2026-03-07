@@ -241,11 +241,6 @@ const Board: React.FC<{
           if (game.active) auditoryInput = true;
           setAuditoryPressed(true);
         }
-      } else if (type === "keyup" || type === "mouseup") {
-        if (code === "KeyA" || (button === 0 && code === "game"))
-          setSpatialPressed(false);
-        if (code === "KeyL" || (button === 2 && code === "game"))
-          setAuditoryPressed(false);
       }
     };
 
@@ -292,6 +287,10 @@ const Board: React.FC<{
     };
 
     const tick = () => {
+      // Clear button highlights from previous interval
+      setSpatialPressed(false);
+      setAuditoryPressed(false);
+
       if (trialsCounterInterval > 0) {
         updateScore(spatialMatchInterval, spatialInput, spatialObj);
         updateScore(auditoryMatchInterval, auditoryInput, auditoryObj);
