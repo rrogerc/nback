@@ -68,6 +68,7 @@ const Score: React.FC<{
             </th>
             <th>Response</th>
             <th>No Response</th>
+            <th>False +</th>
             <th>Trials</th>
             <th>Score</th>
           </tr>
@@ -77,6 +78,7 @@ const Score: React.FC<{
             <th>Spatial</th>
             <td className="green">{spatialObj.TP}</td>
             <td className="red">{spatialObj.FN}</td>
+            <td className="red">{spatialObj.FP}</td>
             <td>{spatialMatches}</td>
             <td className="green">{spatialScore}%</td>
           </tr>
@@ -84,6 +86,7 @@ const Score: React.FC<{
             <th>Auditory</th>
             <td className="green">{auditoryObj.TP}</td>
             <td className="red">{auditoryObj.FN}</td>
+            <td className="red">{auditoryObj.FP}</td>
             <td>{auditoryMatches}</td>
             <td className="green">{auditoryScore}%</td>
           </tr>
@@ -91,6 +94,7 @@ const Score: React.FC<{
             <th>No Stimulus</th>
             <td className="red">{falsePositives}</td>
             <td>{trueNegatives}</td>
+            <td>-</td>
             <td>{falsePositives + trueNegatives}</td>
             <td>-</td>
           </tr>
@@ -98,6 +102,7 @@ const Score: React.FC<{
             <th>Total Stimulus</th>
             <td>{spatialObj.TP + auditoryObj.TP + falsePositives}</td>
             <td>{spatialObj.FN + auditoryObj.FN + trueNegatives}</td>
+            <td>{falsePositives}</td>
             <td>{trials}</td>
             <td className="yellow">{totalScore}%</td>
           </tr>
