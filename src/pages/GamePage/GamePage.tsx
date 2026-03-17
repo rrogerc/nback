@@ -6,10 +6,11 @@ import classes from "./GamePage.module.css";
 const GamePage: React.FC = () => {
   const navigate = useNavigate();
   const goHome = useCallback(() => navigate("/"), [navigate]);
+  const feedback = localStorage.getItem("feedback") !== "off";
 
   return (
     <div className={classes["page"]}>
-      <Game autoStart={true} onGameEnd={goHome} />
+      <Game autoStart={true} onGameEnd={goHome} feedback={feedback} />
     </div>
   );
 };

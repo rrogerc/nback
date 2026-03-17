@@ -11,6 +11,9 @@ const Home: React.FC = () => {
   const [trials, setTrials] = useState<number | string>(
     Number(localStorage.getItem("trials")) || 40
   );
+  const [feedback, setFeedback] = useState(
+    localStorage.getItem("feedback") !== "off"
+  );
 
   const upTask = () => {
     setTask((prev) => {
@@ -92,6 +95,22 @@ const Home: React.FC = () => {
             onBlur={blurTrials}
             className={classes["input"]}
           />
+        </div>
+
+        <div className={classes["setting"]}>
+          <label className={classes["label"]}>Feedback</label>
+          <button
+            className={`${classes["toggle"]} ${feedback ? classes["toggle-on"] : classes["toggle-off"]}`}
+            onClick={() => {
+              setFeedback((prev) => {
+                const next = !prev;
+                localStorage.setItem("feedback", next ? "on" : "off");
+                return next;
+              });
+            }}
+          >
+            {feedback ? "On" : "Off"}
+          </button>
         </div>
       </div>
 

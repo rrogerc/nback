@@ -68,7 +68,8 @@ const Board: React.FC<{
     auditoryScore: number;
     totalScore: number;
   };
-}> = ({ game, setGame, setScore, onQuit, liveScore }) => {
+  feedback: boolean;
+}> = ({ game, setGame, setScore, onQuit, liveScore, feedback }) => {
   const sounds: {
     [key: number]: HTMLAudioElement;
   } = useMemo(() => {
@@ -498,6 +499,7 @@ const Board: React.FC<{
         spatialMatch={spatialMatch}
         auditoryPressed={auditoryPressed}
         auditoryMatch={auditoryMatch}
+        feedback={feedback}
       />
       {trialsCounter > 0 && (
         <div className={classes["live-score"]}>

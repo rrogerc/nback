@@ -8,7 +8,8 @@ import Score from "./Score/Score";
 const Game: React.FC<{
   autoStart?: boolean;
   onGameEnd?: () => void;
-}> = ({ autoStart = false, onGameEnd }) => {
+  feedback?: boolean;
+}> = ({ autoStart = false, onGameEnd, feedback = true }) => {
   const [game, setGame] = useState<{
     active: boolean;
     task: number;
@@ -93,6 +94,7 @@ const Game: React.FC<{
           setScore={setScore}
           onQuit={onGameEnd}
           liveScore={score}
+          feedback={feedback}
         />
       ) : (
         <div className={classes["results"]}>

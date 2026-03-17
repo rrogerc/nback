@@ -8,18 +8,24 @@ const Keys: React.FC<{
   spatialMatch: boolean;
   auditoryPressed: boolean;
   auditoryMatch: boolean;
+  feedback: boolean;
 }> = (props) => {
+  const pressedClass = (match: boolean) =>
+    !props.activeGame
+      ? "button-active"
+      : !props.feedback
+      ? classes["blue"]
+      : match
+      ? classes["green"]
+      : classes["red"];
+
   return (
     <div className={classes["keys"]}>
       <button
         id="KeyA"
         className={
           props.spatialPressed
-            ? !props.activeGame
-              ? "button-active"
-              : props.spatialMatch
-              ? classes["green"]
-              : classes["red"]
+            ? pressedClass(props.spatialMatch)
             : classes["transparent"]
         }
       >
@@ -29,11 +35,7 @@ const Keys: React.FC<{
         id="KeyL"
         className={
           props.auditoryPressed
-            ? !props.activeGame
-              ? "button-active"
-              : props.auditoryMatch
-              ? classes["green"]
-              : classes["red"]
+            ? pressedClass(props.auditoryMatch)
             : classes["transparent"]
         }
       >

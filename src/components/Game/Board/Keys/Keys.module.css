@@ -37,6 +37,11 @@
   border-color: var(--red);
 }
 
+.blue {
+  background-color: var(--blue);
+  border-color: var(--blue);
+}
+
 .blink {
   animation: blinker 1s linear 10;
 }
