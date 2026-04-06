@@ -1,20 +1,18 @@
-import React from "react";
+import type { FC } from "react";
 
 import classes from "./Panel.module.css";
 
-const Panel: React.FC<{
+const Panel: FC<{
   activeGame: boolean;
   spatialPlace: number;
 }> = (props) => {
   return (
     <div
       id="playableClicks"
-      className={`${props.activeGame ? classes["active"] : ""} ${
-        classes["panel"]
-      }`}
+      className={classes["panel"]}
     >
       <div className={classes["row-1"]}>
-        <div className={classes["bottom-right"]}>
+        <div>
           <div
             className={`${classes["circle"]} ${
               props.spatialPlace === 1 ? classes["fill"] : ""
@@ -26,7 +24,7 @@ const Panel: React.FC<{
             props.spatialPlace === 2 ? classes["fill"] : ""
           }`}
         ></div>
-        <div className={classes["bottom-left"]}>
+        <div>
           <div
             className={`${classes["circle"]} ${
               props.spatialPlace === 3 ? classes["fill"] : ""
@@ -41,7 +39,7 @@ const Panel: React.FC<{
           }`}
         ></div>
         <div
-          className={`${classes["circle"]} ${classes["circle-middle"]}`}
+          className={classes["circle"]}
         ></div>
         <div
           className={`${classes["circle"]} ${
@@ -50,7 +48,7 @@ const Panel: React.FC<{
         ></div>
       </div>
       <div className={classes["row-3"]}>
-        <div className={classes["upper-right"]}>
+        <div>
           <div
             className={`${classes["circle"]} ${
               props.spatialPlace === 6 ? classes["fill"] : ""
@@ -62,7 +60,7 @@ const Panel: React.FC<{
             props.spatialPlace === 7 ? classes["fill"] : ""
           }`}
         ></div>
-        <div className={classes["upper-left"]}>
+        <div>
           <div
             className={`${classes["circle"]} ${
               props.spatialPlace === 8 ? classes["fill"] : ""

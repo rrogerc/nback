@@ -1,3 +1,7 @@
+.game-card {
+  width: 100%;
+}
+
 .pause-toggle {
   position: fixed;
   top: 1.6rem;

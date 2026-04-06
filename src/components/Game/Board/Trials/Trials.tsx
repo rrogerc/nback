@@ -1,39 +1,35 @@
-import React, { Dispatch, SetStateAction } from "react";
+import type { FC, Dispatch, SetStateAction, ChangeEvent } from "react";
+import type { GameState } from "../../../../types";
+import { MIN_TRIALS, MAX_TRIALS, LS_TRIALS } from "../../../../constants";
 
 import classes from "./Trials.module.css";
 import Clock from "./Clock/Clock";
 
-const Trials: React.FC<{
+const Trials: FC<{
   activeGame: boolean;
   paused: boolean;
   trials: number;
   trialsCounter: number;
   elapsedTime: number;
   speed: number;
-  setGame: Dispatch<
-    SetStateAction<{
-      active: boolean;
-      task: number;
-      trials: number;
-    }>
-  >;
+  setGame: Dispatch<SetStateAction<GameState>>;
 }> = (props) => {
-  const changeTrialsHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const changeTrialsHandler = (e: ChangeEvent<HTMLInputElement>) => {
     const enteredTrials = +e.currentTarget.value;
 
     props.setGame((prevGame) => {
       return {
         ...prevGame,
         trials:
-          enteredTrials > 999
-            ? 999
-            : enteredTrials < 1
-            ? 1
+          enteredTrials > MAX_TRIALS
+            ? MAX_TRIALS
+            : enteredTrials < MIN_TRIALS
+            ? MIN_TRIALS
             : enteredTrials,
       };
     });
 
-    localStorage.setItem("trials", String(enteredTrials));
+    localStorage.setItem(LS_TRIALS, String(enteredTrials));
   };
 
   return (
@@ -60,8 +56,8 @@ const Trials: React.FC<{
             type="number"
             id="trials-input"
             name="quantity"
-            min="1"
-            max="999"
+            min={MIN_TRIALS}
+            max={MAX_TRIALS}
             value={props.trials}
             className={classes["input"]}
             disabled={props.activeGame ? true : false}

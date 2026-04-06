@@ -1,66 +1,40 @@
-import React from "react";
+import type { FC } from "react";
+import type { ScoreState } from "../../../types";
+import { formatElapsedTime } from "../../../utils/utils";
 
 import classes from "./Score.module.css";
 
-const Score: React.FC<{
-  score: {
-    nback: number;
-    trials: number;
-    spatialScore: number;
-    auditoryScore: number;
-    totalScore: number;
-    speed: number;
-    elapsedTime: number;
-    spatialObj: {
-      TP: number;
-      TN: number;
-      FP: number;
-      FN: number;
-    };
-    auditoryObj: {
-      TP: number;
-      TN: number;
-      FP: number;
-      FN: number;
-    };
-  };
+const Score: FC<{
+  score: ScoreState;
+  nback: number;
+  speed: number;
 }> = ({
   score: {
-    nback,
     trials,
     spatialScore,
     auditoryScore,
-    totalScore,
-    speed,
     elapsedTime,
     spatialObj,
     auditoryObj,
   },
+  nback,
+  speed,
 }) => {
+  const totalScore = Number(((spatialScore + auditoryScore) / 2).toFixed(2));
   const spatialMatches = spatialObj.TP + spatialObj.FN;
   const auditoryMatches = auditoryObj.TP + auditoryObj.FN;
   const falsePositives = spatialObj.FP + auditoryObj.FP;
   const trueNegatives = spatialObj.TN + auditoryObj.TN;
 
-  const formatElapsed = (ms: number) => {
-    const totalMs = ms % 1000;
-    const totalSeconds = Math.floor(ms / 1000);
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-    return `${minutes}:${String(seconds).padStart(2, "0")}.${String(
-      totalMs
-    ).padStart(3, "0")}`;
-  };
-
   return (
-    <div className={classes["score"]}>
+    <div>
       <header className={classes["header"]}>
         <h2 className="mini-title">
           Stimulus<span className="yellow">-</span>Response
         </h2>
       </header>
 
-      <table className="table">
+      <table className={classes["table"]}>
         <thead>
           <tr>
             <th>
@@ -111,7 +85,7 @@ const Score: React.FC<{
 
       <br />
 
-      <table className="table">
+      <table className={classes["table"]}>
         <thead>
           <tr>
             <th>Speed</th>
@@ -123,7 +97,7 @@ const Score: React.FC<{
           <tr>
             <td>{speed}s</td>
             <td>{trials}</td>
-            <td className="blue">{formatElapsed(elapsedTime)}</td>
+            <td className="blue">{formatElapsedTime(elapsedTime)}</td>
           </tr>
         </tbody>
       </table>

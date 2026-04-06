@@ -1,12 +1,13 @@
-import React, {
+import {
   useMemo,
   useEffect,
   useState,
   useRef,
   useCallback,
-  Dispatch,
-  SetStateAction,
 } from "react";
+import type { FC, Dispatch, SetStateAction } from "react";
+import type { GameState, ScoreState, ConfusionMatrix } from "../../../types";
+import { SPEED, STIMULUS_DURATION, TIMER_INTERVAL, POSITION_COUNT, KEY_SPATIAL, KEY_AUDITORY } from "../../../constants";
 
 import h from "../../../assets/sounds/h.wav";
 import j from "../../../assets/sounds/j.wav";
@@ -20,54 +21,16 @@ import t from "../../../assets/sounds/t.wav";
 import Trials from "./Trials/Trials";
 import Panel from "./Panel/Panel";
 import Keys from "./Keys/Keys";
-import { getScore, randomInt } from "../../../utils/utils";
+import { randomInt, updateConfusionMatrix, resolveId, checkNBackMatch, buildScoreState } from "../../../utils/utils";
 
 import classes from "./Board.module.css";
 
-const SPEED = 3000; // ms per interval
-
-const Board: React.FC<{
-  game: {
-    active: boolean;
-    task: number;
-    trials: number;
-  };
-  setGame: Dispatch<
-    SetStateAction<{
-      active: boolean;
-      task: number;
-      trials: number;
-    }>
-  >;
-  setScore: Dispatch<
-    SetStateAction<{
-      nback: number;
-      trials: number;
-      spatialScore: number;
-      auditoryScore: number;
-      totalScore: number;
-      speed: number;
-      elapsedTime: number;
-      spatialObj: {
-        TP: number;
-        TN: number;
-        FP: number;
-        FN: number;
-      };
-      auditoryObj: {
-        TP: number;
-        TN: number;
-        FP: number;
-        FN: number;
-      };
-    }>
-  >;
+const Board: FC<{
+  game: GameState;
+  setGame: Dispatch<SetStateAction<GameState>>;
+  setScore: Dispatch<SetStateAction<ScoreState>>;
   onQuit?: () => void;
-  liveScore: {
-    spatialScore: number;
-    auditoryScore: number;
-    totalScore: number;
-  };
+  liveScore: Pick<ScoreState, "spatialScore" | "auditoryScore">;
   feedback: boolean;
 }> = ({ game, setGame, setScore, onQuit, liveScore, feedback }) => {
   const sounds: {
@@ -109,8 +72,6 @@ const Board: React.FC<{
   const gameStartRef = useRef(0);
   const totalPausedRef = useRef(0);
   const pauseStartRef = useRef(0);
-  // Tick function ref so togglePause can schedule it
-  const tickRef = useRef<(() => void) | null>(null);
   // Helper to schedule next tick
   const scheduleTickRef = useRef<((delay: number) => void) | null>(null);
 
@@ -121,7 +82,7 @@ const Board: React.FC<{
       const el = Date.now() - gameStartRef.current - totalPausedRef.current;
       setElapsedTime(el);
       setScore((prev) => ({ ...prev, elapsedTime: el }));
-    }, 100);
+    }, TIMER_INTERVAL);
   }, [setScore]);
 
   const stopTimer = useCallback(() => {
@@ -194,17 +155,17 @@ const Board: React.FC<{
     let spatialInput: boolean = false;
     let spatialMatchInterval: boolean = false;
     const spatialArr: number[] = [];
-    const spatialObj = { TP: 0, TN: 0, FP: 0, FN: 0 };
+    const spatialObj: ConfusionMatrix = { TP: 0, TN: 0, FP: 0, FN: 0 };
 
     let auditoryInput: boolean = false;
     let auditoryMatchInterval: boolean = false;
     const auditoryArr: number[] = [];
-    const auditoryObj = { TP: 0, TN: 0, FP: 0, FN: 0 };
+    const auditoryObj: ConfusionMatrix = { TP: 0, TN: 0, FP: 0, FN: 0 };
 
     const stopGame = (
       trials: number,
-      sObj: { TP: number; TN: number; FP: number; FN: number },
-      aObj: { TP: number; TN: number; FP: number; FN: number }
+      sObj: ConfusionMatrix,
+      aObj: ConfusionMatrix
     ) => {
       setTrialsCounter(0);
       const finalElapsed =
@@ -212,20 +173,7 @@ const Board: React.FC<{
       setElapsedTime(0);
       stopTimer();
 
-      const spatialScore = getScore(sObj.TP, sObj.FP, sObj.FN);
-      const auditoryScore = getScore(aObj.TP, aObj.FP, aObj.FN);
-
-      setScore({
-        nback: game.task,
-        trials,
-        spatialScore,
-        auditoryScore,
-        totalScore: Number(((spatialScore + auditoryScore) / 2).toFixed(2)),
-        speed: SPEED / 1000,
-        elapsedTime: finalElapsed,
-        spatialObj: sObj,
-        auditoryObj: aObj,
-      });
+      setScore(buildScoreState(trials, sObj, aObj, finalElapsed));
 
       setGame((prevGame) => ({ ...prevGame, active: false }));
     };
@@ -234,11 +182,11 @@ const Board: React.FC<{
       if (pausedRef.current) return;
 
       if (type === "keypress" || type === "mousedown") {
-        if (code === "KeyA" || (button === 0 && code === "game")) {
+        if (code === KEY_SPATIAL || (button === 0 && code === "game")) {
           if (game.active) spatialInput = true;
           setSpatialPressed(true);
         }
-        if (code === "KeyL" || (button === 2 && code === "game")) {
+        if (code === KEY_AUDITORY || (button === 2 && code === "game")) {
           if (game.active) auditoryInput = true;
           setAuditoryPressed(true);
         }
@@ -248,15 +196,12 @@ const Board: React.FC<{
     const keyHandler = (e: KeyboardEvent) =>
       eventHandler(e.type, e.code, -1);
 
-    const resolveId = (el: HTMLElement): string =>
-      el.id || el.parentElement?.id || el.parentElement?.parentElement?.id || "";
-
     const clickHandler = (e: MouseEvent) =>
       eventHandler(e.type, resolveId(e.target as HTMLElement), e.button);
 
     const touchHandler = (e: TouchEvent) => {
       const id = resolveId(e.target as HTMLElement);
-      if (id === "KeyA" || id === "KeyL") {
+      if (id === KEY_SPATIAL || id === KEY_AUDITORY) {
         e.preventDefault(); // prevent synthetic mousedown firing too
         eventHandler(
           e.type === "touchstart" ? "mousedown" : "mouseup",
@@ -264,17 +209,6 @@ const Board: React.FC<{
           -1
         );
       }
-    };
-
-    const updateScore = (
-      match: boolean,
-      input: boolean,
-      obj: { TP: number; TN: number; FP: number; FN: number }
-    ) => {
-      if (match && input) obj.TP++;
-      else if (match && !input) obj.FN++;
-      else if (!match && input) obj.FP++;
-      else if (!match && !input) obj.TN++;
     };
 
     // --- setTimeout-chain game loop ---
@@ -293,23 +227,15 @@ const Board: React.FC<{
       setAuditoryPressed(false);
 
       if (trialsCounterInterval > 0) {
-        updateScore(spatialMatchInterval, spatialInput, spatialObj);
-        updateScore(auditoryMatchInterval, auditoryInput, auditoryObj);
+        updateConfusionMatrix(spatialMatchInterval, spatialInput, spatialObj);
+        updateConfusionMatrix(auditoryMatchInterval, auditoryInput, auditoryObj);
 
-        const liveSpatial = getScore(spatialObj.TP, spatialObj.FP, spatialObj.FN);
-        const liveAuditory = getScore(auditoryObj.TP, auditoryObj.FP, auditoryObj.FN);
-        setScore({
-          nback: game.task,
-          trials: trialsCounterInterval,
-          spatialScore: liveSpatial,
-          auditoryScore: liveAuditory,
-          totalScore: Number(((liveSpatial + liveAuditory) / 2).toFixed(2)),
-          speed: SPEED / 1000,
-          elapsedTime:
-            Date.now() - gameStartRef.current - totalPausedRef.current,
-          spatialObj: { ...spatialObj },
-          auditoryObj: { ...auditoryObj },
-        });
+        setScore(buildScoreState(
+          trialsCounterInterval,
+          spatialObj,
+          auditoryObj,
+          Date.now() - gameStartRef.current - totalPausedRef.current
+        ));
       }
 
       [spatialMatchInterval, spatialInput, auditoryMatchInterval, auditoryInput] =
@@ -320,8 +246,8 @@ const Board: React.FC<{
         return;
       }
 
-      const spatialRandomPlace = randomInt(1, 8);
-      const auditoryRandomPlace = randomInt(1, 8);
+      const spatialRandomPlace = randomInt(1, POSITION_COUNT);
+      const auditoryRandomPlace = randomInt(1, POSITION_COUNT);
 
       // Show spatial stimulus
       setSpatialPlace(spatialRandomPlace);
@@ -330,15 +256,13 @@ const Board: React.FC<{
       // Play auditory stimulus
       const sound = sounds[auditoryRandomPlace];
       sound.currentTime = 0;
-      sound.play();
+      sound.play().catch(() => {});
       auditoryArr.unshift(auditoryRandomPlace);
 
       // Check matches
+      spatialMatchInterval = checkNBackMatch(spatialArr, game.task);
+      auditoryMatchInterval = checkNBackMatch(auditoryArr, game.task);
       if (spatialArr.length > game.task) {
-        if (spatialArr[0] === spatialArr.slice(-1)[0])
-          spatialMatchInterval = true;
-        if (auditoryArr[0] === auditoryArr.slice(-1)[0])
-          auditoryMatchInterval = true;
         spatialArr.pop();
         auditoryArr.pop();
       }
@@ -350,19 +274,18 @@ const Board: React.FC<{
       setTrialsCounter(trialsCounterInterval);
 
       // Hide spatial stimulus after half the interval
-      const hideTime = Date.now() + SPEED / 2;
+      const hideTime = Date.now() + STIMULUS_DURATION;
       spatialHideAtRef.current = hideTime;
       spatialHideRef.current = setTimeout(() => {
         setSpatialPlace(0);
         spatialHideRef.current = null;
         spatialHideAtRef.current = 0;
-      }, SPEED / 2);
+      }, STIMULUS_DURATION);
 
       // Schedule next tick
       scheduleTick(SPEED);
     };
 
-    tickRef.current = tick;
     scheduleTickRef.current = scheduleTick;
 
     if (game.active) {
@@ -371,22 +294,14 @@ const Board: React.FC<{
       totalPausedRef.current = 0;
       gameStartRef.current = Date.now();
 
-      setScore({
-        nback: game.task,
-        trials: 0,
-        spatialScore: 0,
-        auditoryScore: 0,
-        totalScore: 0,
-        speed: SPEED / 1000,
-        elapsedTime: 0,
-        spatialObj: { TP: 0, TN: 0, FP: 0, FN: 0 },
-        auditoryObj: { TP: 0, TN: 0, FP: 0, FN: 0 },
-      });
+      setScore(buildScoreState(0, { TP: 0, TN: 0, FP: 0, FN: 0 }, { TP: 0, TN: 0, FP: 0, FN: 0 }, 0));
 
       startTimer();
       // First tick after SPEED ms
       scheduleTick(SPEED);
     }
+
+    const preventContextMenu = (e: MouseEvent) => e.preventDefault();
 
     window.addEventListener("mousedown", clickHandler);
     window.addEventListener("mouseup", clickHandler);
@@ -394,9 +309,7 @@ const Board: React.FC<{
     window.addEventListener("touchend", touchHandler);
     window.addEventListener("keypress", keyHandler);
     window.addEventListener("keyup", keyHandler);
-    window.addEventListener("contextmenu", (e: MouseEvent) =>
-      e.preventDefault()
-    );
+    window.addEventListener("contextmenu", preventContextMenu);
 
     return () => {
       window.removeEventListener("mousedown", clickHandler);
@@ -405,11 +318,8 @@ const Board: React.FC<{
       window.removeEventListener("touchend", touchHandler);
       window.removeEventListener("keypress", keyHandler);
       window.removeEventListener("keyup", keyHandler);
-      window.removeEventListener("contextmenu", (e: MouseEvent) =>
-        e.preventDefault()
-      );
+      window.removeEventListener("contextmenu", preventContextMenu);
 
-      tickRef.current = null;
       scheduleTickRef.current = null;
 
       if (tickTimeoutRef.current) {
@@ -447,7 +357,7 @@ const Board: React.FC<{
   }, [togglePause]);
 
   return (
-    <div className="game-card">
+    <div className={classes["game-card"]}>
       {paused && (
         <div className={classes["pause-overlay"]}>
           <div className={classes["pause-modal"]}>
@@ -512,7 +422,7 @@ const Board: React.FC<{
           </span>
           <span className={classes["live-divider"]}>|</span>
           <span>
-            Total <span className="yellow">{liveScore.totalScore}%</span>
+            Total <span className="yellow">{((liveScore.spatialScore + liveScore.auditoryScore) / 2).toFixed(2)}%</span>
           </span>
         </div>
       )}

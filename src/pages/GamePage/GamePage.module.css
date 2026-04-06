@@ -3,20 +3,3 @@
   display: flex;
   flex-direction: column;
 }
-
-.header {
-  display: flex;
-  align-items: center;
-  padding: 2rem 4rem;
-}
-
-.back {
-  font-size: 1.6rem;
-  padding: 0.8rem 1.6rem;
-}
-
-@media only screen and (max-width: 39.75em) {
-  .header {
-    padding: 1.5rem 2rem;
-  }
-}

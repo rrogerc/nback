@@ -1,65 +1,31 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
+import type { FC } from "react";
+import type { GameState, ScoreState } from "../../types";
+import { DEFAULT_TASK, DEFAULT_TRIALS, LS_TASK, LS_TRIALS, SPEED } from "../../constants";
 
 import classes from "./Game.module.css";
 
 import Board from "./Board/Board";
 import Score from "./Score/Score";
 
-const Game: React.FC<{
+const Game: FC<{
   autoStart?: boolean;
   onGameEnd?: () => void;
   feedback?: boolean;
 }> = ({ autoStart = false, onGameEnd, feedback = true }) => {
-  const [game, setGame] = useState<{
-    active: boolean;
-    task: number;
-    trials: number;
-  }>({
+  const [game, setGame] = useState<GameState>({
     active: false,
-    task: Number(localStorage.getItem("task")) || 2,
-    trials: Number(localStorage.getItem("trials")) || 40,
+    task: Number(localStorage.getItem(LS_TASK)) || DEFAULT_TASK,
+    trials: Number(localStorage.getItem(LS_TRIALS)) || DEFAULT_TRIALS,
   });
 
-  const [score, setScore] = useState<{
-    nback: number;
-    trials: number;
-    spatialScore: number;
-    auditoryScore: number;
-    totalScore: number;
-    speed: number;
-    elapsedTime: number;
-    spatialObj: {
-      TP: number;
-      TN: number;
-      FP: number;
-      FN: number;
-    };
-    auditoryObj: {
-      TP: number;
-      TN: number;
-      FP: number;
-      FN: number;
-    };
-  }>({
-    nback: 0,
+  const [score, setScore] = useState<ScoreState>({
     trials: 0,
     spatialScore: 0,
     auditoryScore: 0,
-    totalScore: 0,
-    speed: 0,
     elapsedTime: 0,
-    spatialObj: {
-      TP: 0,
-      TN: 0,
-      FP: 0,
-      FN: 0,
-    },
-    auditoryObj: {
-      TP: 0,
-      TN: 0,
-      FP: 0,
-      FN: 0,
-    },
+    spatialObj: { TP: 0, TN: 0, FP: 0, FN: 0 },
+    auditoryObj: { TP: 0, TN: 0, FP: 0, FN: 0 },
   });
 
   // Auto-start on mount
@@ -102,13 +68,13 @@ const Game: React.FC<{
             <>
               <div className={classes["headline"]}>
                 <span className={classes["headline-score"]}>
-                  {score.totalScore}%
+                  {((score.spatialScore + score.auditoryScore) / 2).toFixed(2)}%
                 </span>
                 <span className={classes["headline-label"]}>
-                  {score.nback}-Back Score
+                  {game.task}-Back Score
                 </span>
               </div>
-              <Score score={score} />
+              <Score score={score} nback={game.task} speed={SPEED / 1000} />
               {onGameEnd && (
                 <button className={classes["return"]} onClick={onGameEnd}>
                   Return Home

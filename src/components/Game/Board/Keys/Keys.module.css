@@ -41,13 +41,3 @@
   background-color: var(--blue);
   border-color: var(--blue);
 }
-
-.blink {
-  animation: blinker 1s linear 10;
-}
-
-@keyframes blinker {
-  50% {
-    opacity: 0;
-  }
-}

@@ -1,53 +1,55 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
+import type { FC, ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
+import { DEFAULT_TASK, DEFAULT_TRIALS, MIN_TASK, MAX_TASK, MIN_TRIALS, MAX_TRIALS, LS_TASK, LS_TRIALS, LS_FEEDBACK, KEY_START } from "../../constants";
 import Switch from "../../components/Header/Switch/Switch";
 import classes from "./Home.module.css";
 
-const Home: React.FC = () => {
+const Home: FC = () => {
   const navigate = useNavigate();
   const [task, setTask] = useState(
-    Number(localStorage.getItem("task")) || 2
+    Number(localStorage.getItem(LS_TASK)) || DEFAULT_TASK
   );
   const [trials, setTrials] = useState<number | string>(
-    Number(localStorage.getItem("trials")) || 40
+    Number(localStorage.getItem(LS_TRIALS)) || DEFAULT_TRIALS
   );
   const [feedback, setFeedback] = useState(
-    localStorage.getItem("feedback") !== "off"
+    localStorage.getItem(LS_FEEDBACK) !== "off"
   );
 
   const upTask = () => {
     setTask((prev) => {
-      const next = prev < 99 ? prev + 1 : 99;
-      localStorage.setItem("task", String(next));
+      const next = prev < MAX_TASK ? prev + 1 : MAX_TASK;
+      localStorage.setItem(LS_TASK, String(next));
       return next;
     });
   };
 
   const downTask = () => {
     setTask((prev) => {
-      const next = prev > 1 ? prev - 1 : 1;
-      localStorage.setItem("task", String(next));
+      const next = prev > MIN_TASK ? prev - 1 : MIN_TASK;
+      localStorage.setItem(LS_TASK, String(next));
       return next;
     });
   };
 
-  const changeTrials = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const changeTrials = (e: ChangeEvent<HTMLInputElement>) => {
     const raw = e.currentTarget.value;
     if (raw === "") {
       setTrials("");
       return;
     }
     const val = +raw;
-    const clamped = val > 999 ? 999 : val;
+    const clamped = val > MAX_TRIALS ? MAX_TRIALS : val;
     setTrials(clamped);
-    localStorage.setItem("trials", String(clamped));
+    localStorage.setItem(LS_TRIALS, String(clamped));
   };
 
   const blurTrials = () => {
     const val = Number(trials);
-    const clamped = val < 1 || isNaN(val) ? 1 : val;
+    const clamped = val < MIN_TRIALS || isNaN(val) ? MIN_TRIALS : val;
     setTrials(clamped);
-    localStorage.setItem("trials", String(clamped));
+    localStorage.setItem(LS_TRIALS, String(clamped));
   };
 
   const startGame = useCallback(() => {
@@ -60,7 +62,7 @@ const Home: React.FC = () => {
 
   useEffect(() => {
     const keyHandler = (e: KeyboardEvent) => {
-      if (e.code === "KeyS" && e.type === "keypress") {
+      if (e.code === KEY_START && e.type === "keypress") {
         startGame();
       }
     };
@@ -88,8 +90,8 @@ const Home: React.FC = () => {
           <label className={classes["label"]}>Trials</label>
           <input
             type="number"
-            min="1"
-            max="999"
+            min={MIN_TRIALS}
+            max={MAX_TRIALS}
             value={trials}
             onChange={changeTrials}
             onBlur={blurTrials}
@@ -104,7 +106,7 @@ const Home: React.FC = () => {
             onClick={() => {
               setFeedback((prev) => {
                 const next = !prev;
-                localStorage.setItem("feedback", next ? "on" : "off");
+                localStorage.setItem(LS_FEEDBACK, next ? "on" : "off");
                 return next;
               });
             }}

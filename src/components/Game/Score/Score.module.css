@@ -8,12 +8,20 @@
   margin-bottom: 1.5rem;
 }
 
-.blink {
-  animation: blinker 1s linear 10;
+.table {
+  font-size: 1.8rem;
+  border: 0.1rem solid rgba(128, 128, 128, 0.25);
+  border-collapse: collapse;
+  text-align: center;
+  width: 100%;
 }
 
-@keyframes blinker {
-  50% {
-    opacity: 0;
-  }
+.table th,
+.table td {
+  border: 0.1rem solid rgba(128, 128, 128, 0.25);
+  padding: 1.2rem 1.6rem;
+}
+
+.table th {
+  font-weight: 600;
 }

@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import type { FC } from "react";
+import { LS_THEME } from "../../../constants";
 import classes from "./Switch.module.css";
 
 type Theme = "system" | "light" | "dark";
 
-const Switch: React.FC = () => {
+const Switch: FC = () => {
   const [theme, setTheme] = useState<Theme>(() => {
-    const stored = localStorage.getItem("theme");
+    const stored = localStorage.getItem(LS_THEME);
     if (stored === "light" || stored === "dark") return stored;
     return "system";
   });
@@ -14,10 +16,10 @@ const Switch: React.FC = () => {
     setTheme(t);
     if (t === "system") {
       delete document.documentElement.dataset.theme;
-      localStorage.removeItem("theme");
+      localStorage.removeItem(LS_THEME);
     } else {
       document.documentElement.dataset.theme = t;
-      localStorage.setItem("theme", t);
+      localStorage.setItem(LS_THEME, t);
     }
   };
 

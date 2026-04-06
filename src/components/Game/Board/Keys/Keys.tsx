@@ -1,8 +1,8 @@
-import React from "react";
+import type { FC } from "react";
 
 import classes from "./Keys.module.css";
 
-const Keys: React.FC<{
+const Keys: FC<{
   activeGame: boolean;
   spatialPressed: boolean;
   spatialMatch: boolean;

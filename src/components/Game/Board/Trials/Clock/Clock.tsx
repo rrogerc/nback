@@ -1,24 +1,15 @@
-import React from "react";
+import type { FC } from "react";
+import { formatElapsedTime } from "../../../../../utils/utils";
 
 import classes from "./Clock.module.css";
 
-const Clock: React.FC<{
+const Clock: FC<{
   activeGame: boolean;
   paused: boolean;
   elapsedTime: number;
   speed: number;
   trialsCounter: number;
 }> = ({ activeGame, paused, elapsedTime, speed, trialsCounter }) => {
-  const formatTime = (ms: number) => {
-    const totalMs = ms % 1000;
-    const totalSeconds = Math.floor(ms / 1000);
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-    return `${minutes}:${String(seconds).padStart(2, "0")}.${String(
-      totalMs
-    ).padStart(3, "0")}`;
-  };
-
   return (
     <div className={classes["speed"]}>
       <div className={classes["clock"]}>
@@ -36,7 +27,7 @@ const Clock: React.FC<{
           <div className={classes["dark"]}></div>
         </div>
       </div>
-      <div className={classes["timer"]}>{formatTime(elapsedTime)}</div>
+      <div className={classes["timer"]}>{formatElapsedTime(elapsedTime)}</div>
     </div>
   );
 };
