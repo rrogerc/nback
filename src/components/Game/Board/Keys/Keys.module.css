@@ -5,6 +5,7 @@
   margin-top: 2rem;
   margin-bottom: 2rem;
   gap: 2rem;
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .keys button {
@@ -17,8 +18,15 @@
 }
 
 @media only screen and (max-width: 39.75em) {
+  .keys {
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    gap: 1rem;
+  }
+
   .keys button {
     padding: 2rem 1.5rem;
+    min-height: 5.5rem;
   }
 }
 

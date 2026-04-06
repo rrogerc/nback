@@ -118,4 +118,8 @@
   .pause-hint {
     display: none;
   }
+
+  .live-score {
+    margin-top: 0.5rem;
+  }
 }

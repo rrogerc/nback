@@ -29,7 +29,7 @@ const Keys: FC<{
             : classes["transparent"]
         }
       >
-        KeyA: Spatial
+        Position
       </button>
       <button
         id="KeyL"
@@ -39,7 +39,7 @@ const Keys: FC<{
             : classes["transparent"]
         }
       >
-        KeyL: Auditory
+        Sound
       </button>
     </div>
   );

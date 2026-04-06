@@ -5,7 +5,7 @@
   align-items: center;
   justify-content: center;
 
-  padding: 3rem;
+  padding: clamp(1rem, 2vmin, 3rem);
 
   touch-action: manipulation;
   -webkit-user-select: none;
@@ -22,8 +22,8 @@
 }
 
 .circle {
-  width: 11rem;
-  height: 11rem;
+  width: clamp(6rem, 22vmin, 11rem);
+  aspect-ratio: 1;
   border: 0.2rem solid var(--main-color);
   border-radius: 0.5rem;
   flex: 1;

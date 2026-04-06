@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import type { FC, ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { DEFAULT_TASK, DEFAULT_TRIALS, MIN_TASK, MAX_TASK, MIN_TRIALS, MAX_TRIALS, LS_TASK, LS_TRIALS, LS_FEEDBACK, KEY_START } from "../../constants";
+import { unlockAudio } from "../../audio";
 import Switch from "../../components/Header/Switch/Switch";
 import classes from "./Home.module.css";
 
@@ -53,10 +54,7 @@ const Home: FC = () => {
   };
 
   const startGame = useCallback(() => {
-    // Unlock audio context on iOS (must happen in user gesture call stack)
-    const a = new Audio();
-    a.play().catch(() => {});
-    a.pause();
+    unlockAudio();
     navigate("/game");
   }, [navigate]);
 

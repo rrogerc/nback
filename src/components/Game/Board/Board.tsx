@@ -1,5 +1,4 @@
 import {
-  useMemo,
   useEffect,
   useState,
   useRef,
@@ -9,14 +8,15 @@ import type { FC, Dispatch, SetStateAction } from "react";
 import type { GameState, ScoreState, ConfusionMatrix } from "../../../types";
 import { SPEED, STIMULUS_DURATION, TIMER_INTERVAL, POSITION_COUNT, KEY_SPATIAL, KEY_AUDITORY } from "../../../constants";
 
-import h from "../../../assets/sounds/h.wav";
-import j from "../../../assets/sounds/j.wav";
-import k from "../../../assets/sounds/k.wav";
-import l from "../../../assets/sounds/l.wav";
-import q from "../../../assets/sounds/q.wav";
-import r from "../../../assets/sounds/r.wav";
-import s from "../../../assets/sounds/s.wav";
-import t from "../../../assets/sounds/t.wav";
+import hUrl from "../../../assets/sounds/h.wav";
+import jUrl from "../../../assets/sounds/j.wav";
+import kUrl from "../../../assets/sounds/k.wav";
+import lUrl from "../../../assets/sounds/l.wav";
+import qUrl from "../../../assets/sounds/q.wav";
+import rUrl from "../../../assets/sounds/r.wav";
+import sUrl from "../../../assets/sounds/s.wav";
+import tUrl from "../../../assets/sounds/t.wav";
+import { loadSounds, playSound } from "../../../audio";
 
 import Trials from "./Trials/Trials";
 import Panel from "./Panel/Panel";
@@ -33,19 +33,14 @@ const Board: FC<{
   liveScore: Pick<ScoreState, "spatialScore" | "auditoryScore">;
   feedback: boolean;
 }> = ({ game, setGame, setScore, onQuit, liveScore, feedback }) => {
-  const sounds: {
-    [key: number]: HTMLAudioElement;
-  } = useMemo(() => {
-    return {
-      1: new Audio(h),
-      2: new Audio(j),
-      3: new Audio(k),
-      4: new Audio(l),
-      5: new Audio(q),
-      6: new Audio(r),
-      7: new Audio(s),
-      8: new Audio(t),
+  const [sounds, setSounds] = useState<Record<number, AudioBuffer>>({});
+
+  useEffect(() => {
+    const urls: Record<number, string> = {
+      1: hUrl, 2: jUrl, 3: kUrl, 4: lUrl,
+      5: qUrl, 6: rUrl, 7: sUrl, 8: tUrl,
     };
+    loadSounds(urls).then(setSounds);
   }, []);
 
   const [spatialPlace, setSpatialPlace] = useState<number>(0);
@@ -254,9 +249,8 @@ const Board: FC<{
       spatialArr.unshift(spatialRandomPlace);
 
       // Play auditory stimulus
-      const sound = sounds[auditoryRandomPlace];
-      sound.currentTime = 0;
-      sound.play().catch(() => {});
+      const buffer = sounds[auditoryRandomPlace];
+      if (buffer) playSound(buffer);
       auditoryArr.unshift(auditoryRandomPlace);
 
       // Check matches
@@ -355,6 +349,49 @@ const Board: FC<{
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, [togglePause]);
+
+  // Wake Lock: keep screen awake during gameplay
+  useEffect(() => {
+    if (!game.active) return;
+    let wakeLock: WakeLockSentinel | null = null;
+
+    const requestWakeLock = async () => {
+      if ("wakeLock" in navigator) {
+        try {
+          wakeLock = await navigator.wakeLock.request("screen");
+        } catch { /* not available or denied */ }
+      }
+    };
+
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible") requestWakeLock();
+    };
+
+    requestWakeLock();
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibility);
+      wakeLock?.release();
+    };
+  }, [game.active]);
+
+  // Back button trap: show pause menu instead of navigating away
+  useEffect(() => {
+    if (!game.active) return;
+
+    history.pushState({ nbackGame: true }, "");
+
+    const handler = () => {
+      if (game.active) {
+        history.pushState({ nbackGame: true }, "");
+        togglePause();
+      }
+    };
+
+    window.addEventListener("popstate", handler);
+    return () => window.removeEventListener("popstate", handler);
+  }, [game.active, togglePause]);
 
   return (
     <div className={classes["game-card"]}>
