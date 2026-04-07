@@ -53,8 +53,8 @@ const Home: FC = () => {
     localStorage.setItem(LS_TRIALS, String(clamped));
   };
 
-  const startGame = useCallback(() => {
-    unlockAudio();
+  const startGame = useCallback(async () => {
+    await unlockAudio();
     navigate("/game");
   }, [navigate]);
 

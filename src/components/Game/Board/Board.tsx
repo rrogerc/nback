@@ -16,7 +16,7 @@ import qUrl from "../../../assets/sounds/q.wav";
 import rUrl from "../../../assets/sounds/r.wav";
 import sUrl from "../../../assets/sounds/s.wav";
 import tUrl from "../../../assets/sounds/t.wav";
-import { loadSounds, playSound } from "../../../audio";
+import { loadSounds, playSound, resumeAudio } from "../../../audio";
 
 import Trials from "./Trials/Trials";
 import Panel from "./Panel/Panel";
@@ -175,6 +175,8 @@ const Board: FC<{
 
     const eventHandler = (type: string, code: string, button: number) => {
       if (pausedRef.current) return;
+      // Resume AudioContext from user gesture if iOS re-suspended it
+      resumeAudio();
 
       if (type === "keypress" || type === "mousedown") {
         if (code === KEY_SPATIAL || (button === 0 && code === "game")) {
