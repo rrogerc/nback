@@ -447,21 +447,22 @@ const Board: FC<{
         auditoryMatch={auditoryMatch}
         feedback={feedback}
       />
-      {trialsCounter > 0 && (
-        <div className={classes["live-score"]}>
-          <span>
-            Spatial <span className="green">{liveScore.spatialScore}%</span>
-          </span>
-          <span className={classes["live-divider"]}>|</span>
-          <span>
-            Auditory <span className="green">{liveScore.auditoryScore}%</span>
-          </span>
-          <span className={classes["live-divider"]}>|</span>
-          <span>
-            Total <span className="yellow">{((liveScore.spatialScore + liveScore.auditoryScore) / 2).toFixed(2)}%</span>
-          </span>
-        </div>
-      )}
+      <div
+        className={classes["live-score"]}
+        style={{ visibility: trialsCounter > 0 ? "visible" : "hidden" }}
+      >
+        <span>
+          Spatial <span className="green">{liveScore.spatialScore}%</span>
+        </span>
+        <span className={classes["live-divider"]}>|</span>
+        <span>
+          Auditory <span className="green">{liveScore.auditoryScore}%</span>
+        </span>
+        <span className={classes["live-divider"]}>|</span>
+        <span>
+          Total <span className="yellow">{((liveScore.spatialScore + liveScore.auditoryScore) / 2).toFixed(2)}%</span>
+        </span>
+      </div>
     </div>
   );
 };
