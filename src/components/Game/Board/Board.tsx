@@ -33,14 +33,14 @@ const Board: FC<{
   liveScore: Pick<ScoreState, "spatialScore" | "auditoryScore">;
   feedback: boolean;
 }> = ({ game, setGame, setScore, onQuit, liveScore, feedback }) => {
-  const [sounds, setSounds] = useState<Record<number, AudioBuffer>>({});
+  const soundsRef = useRef<Record<number, AudioBuffer>>({});
 
   useEffect(() => {
     const urls: Record<number, string> = {
       1: hUrl, 2: jUrl, 3: kUrl, 4: lUrl,
       5: qUrl, 6: rUrl, 7: sUrl, 8: tUrl,
     };
-    loadSounds(urls).then(setSounds);
+    loadSounds(urls).then((loaded) => { soundsRef.current = loaded; });
   }, []);
 
   const [spatialPlace, setSpatialPlace] = useState<number>(0);
@@ -249,7 +249,7 @@ const Board: FC<{
       spatialArr.unshift(spatialRandomPlace);
 
       // Play auditory stimulus
-      const buffer = sounds[auditoryRandomPlace];
+      const buffer = soundsRef.current[auditoryRandomPlace];
       if (buffer) playSound(buffer);
       auditoryArr.unshift(auditoryRandomPlace);
 
@@ -336,7 +336,6 @@ const Board: FC<{
     game.trials,
     setGame,
     setScore,
-    sounds,
     startTimer,
     stopTimer,
   ]);
