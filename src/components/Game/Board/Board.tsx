@@ -327,10 +327,6 @@ const Board: FC<{
         spatialHideRef.current = null;
       }
       stopTimer();
-
-      if (game.active) {
-        stopGame(trialsCounterInterval, spatialObj, auditoryObj);
-      }
     };
   }, [
     game.active,
