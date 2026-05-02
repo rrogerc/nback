@@ -96,29 +96,34 @@ const Home: FC = () => {
             className={classes["input"]}
           />
         </div>
-
-        <div className={classes["setting"]}>
-          <label className={classes["label"]}>Feedback</label>
-          <button
-            className={`${classes["toggle"]} ${feedback ? classes["toggle-on"] : classes["toggle-off"]}`}
-            onClick={() => {
-              setFeedback((prev) => {
-                const next = !prev;
-                localStorage.setItem(LS_FEEDBACK, next ? "on" : "off");
-                return next;
-              });
-            }}
-          >
-            {feedback ? "On" : "Off"}
-          </button>
-        </div>
       </div>
 
       <button className={classes["start"]} onClick={startGame}>
         Start
       </button>
 
-      <div className={classes["theme"]}>
+      <div className={classes["controls"]}>
+        <div className={classes["control-group"]}>
+          <span className={classes["control-label"]}>Feedback</span>
+          <div className={classes["picker"]}>
+            {(["on", "off"] as const).map((val) => {
+              const active = (feedback ? "on" : "off") === val;
+              return (
+                <button
+                  key={val}
+                  className={`${classes["picker-option"]} ${active ? classes["picker-active"] : ""}`}
+                  onClick={() => {
+                    const next = val === "on";
+                    setFeedback(next);
+                    localStorage.setItem(LS_FEEDBACK, next ? "on" : "off");
+                  }}
+                >
+                  {val === "on" ? "On" : "Off"}
+                </button>
+              );
+            })}
+          </div>
+        </div>
         <Switch />
       </div>
     </main>

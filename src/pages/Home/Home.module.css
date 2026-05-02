@@ -131,38 +131,59 @@
   border-bottom-color: var(--yellow);
 }
 
-.toggle {
-  font-size: 2rem;
-  font-weight: 600;
-  padding: 0.6rem 2rem;
-  border-radius: 0.6rem;
-  cursor: pointer;
-  min-width: 7rem;
-  text-align: center;
-  transition: background-color 0.15s ease, border-color 0.15s ease;
-}
-
-.toggle-on {
-  background-color: var(--green);
-  border-color: var(--green);
-  color: #fff;
-}
-
-.toggle-off {
-  background-color: transparent;
-  border-color: var(--main-color);
-  color: var(--main-color);
-}
-
 .start {
   font-size: 2.2rem;
   padding: 1.4rem 5rem;
 }
 
-.theme {
+.controls {
   position: absolute;
   top: 2.5rem;
   right: 4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1rem;
+}
+
+.control-group {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.control-label {
+  font-size: 1.3rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.7;
+}
+
+.picker {
+  display: flex;
+  border: 0.15rem solid var(--main-color);
+  border-radius: 0.8rem;
+  overflow: hidden;
+}
+
+.picker-option {
+  padding: 0.8rem 1.4rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 0;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.picker-option + .picker-option {
+  border-left: 0.15rem solid var(--main-color);
+}
+
+.picker-active {
+  background-color: var(--main-color);
+  color: var(--main-bg-color);
 }
 
 @media only screen and (max-width: 39.75em) {
@@ -180,7 +201,7 @@
     min-width: auto;
   }
 
-  .theme {
+  .controls {
     top: 1.5rem;
     right: 2rem;
   }
