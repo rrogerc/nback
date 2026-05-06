@@ -447,7 +447,7 @@ const Board: FC<{
       />
       <div
         className={classes["live-score"]}
-        style={{ visibility: trialsCounter > 0 ? "visible" : "hidden" }}
+        style={{ visibility: feedback && trialsCounter > 0 ? "visible" : "hidden" }}
       >
         <span>
           Spatial <span className="green">{liveScore.spatialScore}%</span>
