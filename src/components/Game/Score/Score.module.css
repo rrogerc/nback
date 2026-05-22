@@ -8,6 +8,12 @@
   margin-bottom: 1.5rem;
 }
 
+.table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .table {
   font-size: 1.8rem;
   border: 0.1rem solid rgba(128, 128, 128, 0.25);

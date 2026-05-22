@@ -4,8 +4,8 @@
 
 .pause-toggle {
   position: fixed;
-  top: 1.6rem;
-  right: 1.6rem;
+  top: calc(env(safe-area-inset-top, 0px) + 1.6rem);
+  right: calc(env(safe-area-inset-right, 0px) + 1.6rem);
   z-index: 999;
   font-size: 1.4rem;
   padding: 0.6rem 1rem;
