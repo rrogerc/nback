@@ -180,29 +180,46 @@ const Board: FC<{
 
       if (type === "keypress" || type === "mousedown") {
         if (code === KEY_SPATIAL || (button === 0 && code === "game")) {
-          if (game.active) spatialInput = true;
+          if (game.active) {
+            spatialInput = true;
+            navigator.vibrate?.(10);
+          }
           setSpatialPressed(true);
         }
         if (code === KEY_AUDITORY || (button === 2 && code === "game")) {
-          if (game.active) auditoryInput = true;
+          if (game.active) {
+            auditoryInput = true;
+            navigator.vibrate?.(10);
+          }
           setAuditoryPressed(true);
         }
       }
     };
 
-    const keyHandler = (e: KeyboardEvent) =>
+    const keyHandler = (e: KeyboardEvent) => {
+      if (e.repeat) return;
       eventHandler(e.type, e.code, -1);
+    };
 
     const clickHandler = (e: MouseEvent) =>
       eventHandler(e.type, resolveId(e.target as HTMLElement), e.button);
 
     const touchHandler = (e: TouchEvent) => {
-      const id = resolveId(e.target as HTMLElement);
+      const target = e.target as HTMLElement;
+      const id = resolveId(target);
       if (id === KEY_SPATIAL || id === KEY_AUDITORY) {
         e.preventDefault(); // prevent synthetic mousedown firing too
         eventHandler(
           e.type === "touchstart" ? "mousedown" : "mouseup",
           id,
+          -1
+        );
+      } else if (target.closest("#playableClicks")) {
+        // Tap anywhere on the 3×3 grid counts as a spatial input on touch
+        e.preventDefault();
+        eventHandler(
+          e.type === "touchstart" ? "mousedown" : "mouseup",
+          KEY_SPATIAL,
           -1
         );
       }
