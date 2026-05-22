@@ -378,7 +378,12 @@ const Board: FC<{
     };
 
     const handleVisibility = () => {
-      if (document.visibilityState === "visible") requestWakeLock();
+      if (document.visibilityState === "visible") {
+        requestWakeLock();
+        // iOS interrupts the AudioContext when the PWA is backgrounded —
+        // resume on return so the next tick's playSound has a live timeline.
+        resumeAudio();
+      }
     };
 
     requestWakeLock();

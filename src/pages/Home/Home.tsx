@@ -53,8 +53,9 @@ const Home: FC = () => {
     localStorage.setItem(LS_TRIALS, String(clamped));
   };
 
-  const startGame = useCallback(async () => {
-    await unlockAudio();
+  const startGame = useCallback(() => {
+    // Unlock must run synchronously inside the gesture on iOS.
+    unlockAudio();
     navigate("/game");
   }, [navigate]);
 

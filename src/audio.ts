@@ -10,28 +10,37 @@ function getAudioContext(): AudioContext {
   return audioContext;
 }
 
-/** Call inside a user gesture (click/tap) to unlock audio on iOS. */
-export async function unlockAudio(): Promise<void> {
+/**
+ * Call SYNCHRONOUSLY inside a user gesture (click/tap) to unlock audio on iOS.
+ * The silent-buffer play must happen within the gesture; awaiting ctx.resume()
+ * first loses the gesture context on iOS Safari and leaves audio dead.
+ */
+export function unlockAudio(): void {
   const ctx = getAudioContext();
-  if (ctx.state === "suspended") {
-    await ctx.resume();
+  // Play a silent buffer synchronously — this is what actually unlocks iOS.
+  try {
+    const buffer = ctx.createBuffer(1, 1, ctx.sampleRate);
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+    source.connect(ctx.destination);
+    source.start(0);
+  } catch {
+    /* ignore */
   }
-  // Play a silent buffer to fully unlock on iOS
-  const buffer = ctx.createBuffer(1, 1, 22050);
-  const source = ctx.createBufferSource();
-  source.buffer = buffer;
-  source.connect(ctx.destination);
-  source.start(0);
+  // Then transition state to "running" (fire-and-forget).
+  if (ctx.state !== "running") {
+    ctx.resume().catch(() => {});
+  }
 }
 
 /**
- * Resume a suspended AudioContext. Call from user-gesture handlers
- * (touch/click) to recover audio after iOS re-suspends it
- * (e.g. tab switch, phone call).
+ * Resume a non-running AudioContext. Call from user-gesture handlers and
+ * visibilitychange to recover after iOS suspends/interrupts the context
+ * (tab switch, phone call, backgrounding a PWA).
  */
 export function resumeAudio(): void {
-  if (audioContext && audioContext.state === "suspended") {
-    audioContext.resume();
+  if (audioContext && audioContext.state !== "running") {
+    audioContext.resume().catch(() => {});
   }
 }
 
@@ -60,11 +69,23 @@ export async function loadSounds(
   return Object.fromEntries(entries);
 }
 
-/** Play a pre-decoded AudioBuffer with near-zero latency. */
-export function playSound(buffer: AudioBuffer): void {
+/**
+ * Play a pre-decoded AudioBuffer. If the context isn't running, awaits
+ * resume() first so the source is started against a live timeline (otherwise
+ * start(0) schedules into a frozen clock and the sound never plays).
+ */
+export async function playSound(buffer: AudioBuffer): Promise<void> {
   const ctx = getAudioContext();
-  if (ctx.state === "suspended") {
-    ctx.resume();
+  if (ctx.state !== "running") {
+    try {
+      await ctx.resume();
+    } catch {
+      return;
+    }
+    // iOS can resolve resume() without actually transitioning to "running"
+    // (e.g. when the PWA is in the background) — bail rather than scheduling
+    // into a frozen timeline.
+    if ((ctx.state as string) !== "running") return;
   }
   const source = ctx.createBufferSource();
   source.buffer = buffer;
