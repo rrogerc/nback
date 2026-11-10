@@ -1,61 +1,11 @@
 let audioContext: AudioContext | null = null;
 const bufferCache = new Map<string, AudioBuffer>();
 
-// --- Diagnostics (temporary, on-screen overlay reads from here) ---
-type AudioDiag = {
-  ctxState: string;
-  sampleRate: number;
-  loadAttempts: number;
-  loadSuccess: number;
-  loadErrors: string[];
-  playAttempts: number;
-  playStarted: number;
-  playSkipped: number;
-  playLastError: string;
-  resumeCalls: number;
-  unlockCalled: boolean;
-};
-
-const diag: AudioDiag = {
-  ctxState: "uninit",
-  sampleRate: 0,
-  loadAttempts: 0,
-  loadSuccess: 0,
-  loadErrors: [],
-  playAttempts: 0,
-  playStarted: 0,
-  playSkipped: 0,
-  playLastError: "",
-  resumeCalls: 0,
-  unlockCalled: false,
-};
-
-const diagListeners = new Set<() => void>();
-const notify = () => diagListeners.forEach((l) => l());
-
-export function subscribeAudioDiag(cb: () => void): () => void {
-  diagListeners.add(cb);
-  return () => {
-    diagListeners.delete(cb);
-  };
-}
-
-export function getAudioDiag(): AudioDiag {
-  return diag;
-}
-
 function getAudioContext(): AudioContext {
   if (!audioContext) {
     audioContext = new (window.AudioContext ||
       (window as unknown as { webkitAudioContext: typeof AudioContext })
         .webkitAudioContext)();
-    diag.ctxState = audioContext.state;
-    diag.sampleRate = audioContext.sampleRate;
-    audioContext.onstatechange = () => {
-      diag.ctxState = audioContext!.state;
-      notify();
-    };
-    notify();
   }
   return audioContext;
 }
@@ -66,7 +16,6 @@ function getAudioContext(): AudioContext {
  * first loses the gesture context on iOS Safari and leaves audio dead.
  */
 export function unlockAudio(): void {
-  diag.unlockCalled = true;
   const ctx = getAudioContext();
   // Play a silent buffer synchronously — this is what actually unlocks iOS.
   try {
@@ -75,22 +24,13 @@ export function unlockAudio(): void {
     source.buffer = buffer;
     source.connect(ctx.destination);
     source.start(0);
-  } catch (e) {
-    diag.playLastError = `unlock silent-buffer threw: ${
-      (e as Error)?.message ?? e
-    }`;
+  } catch {
+    /* ignore */
   }
   // Then transition state to "running" (fire-and-forget).
   if (ctx.state !== "running") {
-    diag.resumeCalls++;
-    ctx.resume().catch((e) => {
-      diag.playLastError = `unlock resume threw: ${
-        (e as Error)?.message ?? e
-      }`;
-      notify();
-    });
+    ctx.resume().catch(() => {});
   }
-  notify();
 }
 
 /**
@@ -100,12 +40,7 @@ export function unlockAudio(): void {
  */
 export function resumeAudio(): void {
   if (audioContext && audioContext.state !== "running") {
-    diag.resumeCalls++;
-    audioContext.resume().catch((e) => {
-      diag.playLastError = `resumeAudio threw: ${(e as Error)?.message ?? e}`;
-      notify();
-    });
-    notify();
+    audioContext.resume().catch(() => {});
   }
 }
 
@@ -114,10 +49,6 @@ export async function loadSounds(
   urls: Record<number, string>
 ): Promise<Record<number, AudioBuffer>> {
   const ctx = getAudioContext();
-  diag.loadAttempts = Object.keys(urls).length;
-  diag.loadSuccess = 0;
-  diag.loadErrors = [];
-  notify();
 
   const settled = await Promise.allSettled(
     Object.entries(urls).map(async ([key, url]) => {
@@ -135,23 +66,14 @@ export async function loadSounds(
     })
   );
 
+  // A sound that fails to load is left out, and Board skips missing buffers.
   const entries = settled.reduce<(readonly [number, AudioBuffer])[]>(
     (acc, result) => {
-      if (result.status === "fulfilled") {
-        acc.push(result.value);
-      } else {
-        const msg =
-          result.reason instanceof Error
-            ? `${result.reason.name}: ${result.reason.message}`
-            : String(result.reason);
-        diag.loadErrors.push(msg);
-      }
+      if (result.status === "fulfilled") acc.push(result.value);
       return acc;
     },
     []
   );
-  diag.loadSuccess = entries.length;
-  notify();
   return Object.fromEntries(entries);
 }
 
@@ -161,36 +83,24 @@ export async function loadSounds(
  * start(0) schedules into a frozen clock and the sound never plays).
  */
 export async function playSound(buffer: AudioBuffer): Promise<void> {
-  diag.playAttempts++;
   const ctx = getAudioContext();
   if (ctx.state !== "running") {
     try {
-      diag.resumeCalls++;
       await ctx.resume();
-    } catch (e) {
-      diag.playSkipped++;
-      diag.playLastError = `resume threw: ${(e as Error)?.message ?? e}`;
-      notify();
+    } catch {
       return;
     }
     // iOS can resolve resume() without actually transitioning to "running"
     // (e.g. when the PWA is in the background) — bail rather than scheduling
     // into a frozen timeline.
-    if ((ctx.state as string) !== "running") {
-      diag.playSkipped++;
-      diag.playLastError = `state=${ctx.state} after resume`;
-      notify();
-      return;
-    }
+    if ((ctx.state as string) !== "running") return;
   }
   try {
     const source = ctx.createBufferSource();
     source.buffer = buffer;
     source.connect(ctx.destination);
     source.start(0);
-    diag.playStarted++;
-  } catch (e) {
-    diag.playLastError = `start threw: ${(e as Error)?.message ?? e}`;
+  } catch {
+    /* ignore */
   }
-  notify();
 }

@@ -3,7 +3,6 @@ import "./App.css";
 import Home from "./pages/Home/Home";
 import GamePage from "./pages/GamePage/GamePage";
 import PWAUpdatePrompt from "./components/PWAUpdatePrompt";
-import AudioDiagnostics from "./components/AudioDiagnostics";
 
 function App() {
   return (
@@ -13,7 +12,6 @@ function App() {
         <Route path="/game" element={<GamePage />} />
       </Routes>
       <PWAUpdatePrompt />
-      <AudioDiagnostics />
     </div>
   );
 }
