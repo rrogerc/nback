@@ -3,6 +3,7 @@ import type { FC, ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { DEFAULT_TASK, DEFAULT_TRIALS, MIN_TASK, MAX_TASK, MIN_TRIALS, MAX_TRIALS, LS_TASK, LS_TRIALS, LS_FEEDBACK, KEY_START } from "../../constants";
 import { unlockAudio } from "../../audio";
+import { formatDuration, gameDurationMs } from "../../utils/utils";
 import Switch from "../../components/Header/Switch/Switch";
 import classes from "./Home.module.css";
 
@@ -53,6 +54,11 @@ const Home: FC = () => {
     localStorage.setItem(LS_TRIALS, String(clamped));
   };
 
+  // Empty or below-minimum input shows no duration until blur clamps it.
+  const trialCount = Number(trials);
+  const duration =
+    trialCount >= MIN_TRIALS ? formatDuration(gameDurationMs(trialCount)) : "";
+
   const startGame = useCallback(() => {
     // Unlock must run synchronously inside the gesture on iOS.
     unlockAudio();
@@ -87,15 +93,20 @@ const Home: FC = () => {
 
         <div className={classes["setting"]}>
           <label className={classes["label"]}>Trials</label>
-          <input
-            type="number"
-            min={MIN_TRIALS}
-            max={MAX_TRIALS}
-            value={trials}
-            onChange={changeTrials}
-            onBlur={blurTrials}
-            className={classes["input"]}
-          />
+          <div className={classes["trials"]}>
+            <input
+              type="number"
+              min={MIN_TRIALS}
+              max={MAX_TRIALS}
+              value={trials}
+              onChange={changeTrials}
+              onBlur={blurTrials}
+              className={classes["input"]}
+            />
+            <span className={classes["duration"]} title="Game length">
+              {duration}
+            </span>
+          </div>
         </div>
       </div>
 

@@ -131,6 +131,22 @@
   border-bottom-color: var(--yellow);
 }
 
+.trials {
+  display: flex;
+  align-items: baseline;
+}
+
+/* Zero width, so the readout hangs to the right without moving the centered input. */
+.duration {
+  width: 0;
+  white-space: nowrap;
+  text-indent: 1.4rem;
+  font-size: 1.8rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.6;
+}
+
 .start {
   font-size: 2.2rem;
   padding: 1.4rem 5rem;

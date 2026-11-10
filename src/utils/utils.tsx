@@ -1,4 +1,5 @@
 import type { ConfusionMatrix, ScoreState } from "../types";
+import { SPEED } from "../constants";
 
 const getScore = (TP: number, FP: number, FN: number) =>
   Number(
@@ -51,4 +52,20 @@ export const formatElapsedTime = (ms: number): string => {
   return `${minutes}:${String(seconds).padStart(2, "0")}.${String(
     totalMs
   ).padStart(3, "0")}`;
+};
+
+/**
+ * Length of a game in ms. Board waits one interval before the first stimulus,
+ * then runs one interval per trial and stops once the trial counter reaches
+ * `trials`, so a fractional count rounds up.
+ */
+export const gameDurationMs = (trials: number): number =>
+  (Math.ceil(trials) + 1) * SPEED;
+
+/** Whole-second duration as m:ss, e.g. 123000 -> "2:03". */
+export const formatDuration = (ms: number): string => {
+  const totalSeconds = Math.round(ms / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}:${String(seconds).padStart(2, "0")}`;
 };
