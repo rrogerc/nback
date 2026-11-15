@@ -72,7 +72,7 @@ Last verified 2026-11-09 on macOS 26.5 with Vite 6.4, in Zen 1.24 and Chrome 157
 
 ### What is not set up
 
-- **Vercel is still connected.** The app was hosted on GitHub Pages, then on Vercel, and the local hosting above is meant to replace both. As of 2026-11-09 the Vercel project still exists, is still linked to this GitHub repo, and still serves an older build publicly. A push can therefore trigger a build there, so do not assume a push only reaches GitHub. Check `gh api repos/rrogerc/nback/deployments` if unsure. Do not deploy, re-link, or change that project unless asked. A local `.vercel/` directory is the CLI link to it.
+- **No public deployment.** The app was hosted on GitHub Pages, then on Vercel, and the local hosting above replaced both. The Vercel project was deleted on 2026-11-10 and GitHub Pages was switched off on 2026-11-15, so a push now reaches only GitHub. Do not deploy anywhere unless asked.
 - **No access from other devices, phones included.** Serving the full app to a phone needs real HTTPS, for the same secure-context reason. The option scoped so far is Tailscale Serve. It needs HTTPS certificates enabled for the tailnet and the phone joined to it, which only the owner can do, plus `preview: { allowedHosts: [".ts.net"] }` in `vite.config.ts`, because Vite answers 403 to any hostname that is not an IP or `*.localhost`.
 - **Device testing in the meantime.** Audio does not need a secure context, so `npm run dev -- --host` on the same Wi-Fi should be enough for a one-off test on a phone, without the service worker or Wake Lock. This route is untested here, and it exposes the dev server to the local network, so ask first and stop it afterwards.
 
