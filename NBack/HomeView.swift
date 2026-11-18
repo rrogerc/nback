@@ -5,9 +5,8 @@ struct HomeView: View {
 
     @AppStorage(SettingsKey.level) private var level = Rules.defaultLevel
     @AppStorage(SettingsKey.trials) private var trials = Rules.defaultTrials
-    @AppStorage(SettingsKey.feedback) private var feedback = true
-    @AppStorage(SettingsKey.theme) private var theme = ThemePreference.system
     @State private var trialsText: String
+    @State private var isShowingSettings = false
     @FocusState private var focus: Focus?
 
     /// The page itself takes focus by default. Otherwise macOS focuses the trials field
@@ -45,15 +44,13 @@ struct HomeView: View {
         .focused($focus, equals: .page)
         .defaultFocus($focus, .page)
         .overlay(alignment: .topTrailing) {
-            controls
-                .padding(.top, 25)
-                .padding(.trailing, 40)
+            settingsButton
+                .padding(16)
         }
         .onChange(of: trialsText) { _, text in trialsTextChanged(text) }
         .onChange(of: focus) { old, new in
             if old == .trials && new != .trials { commitTrials() }
         }
-        .onChange(of: theme) { _, theme in theme.apply() }
     }
 
     private func settingRow<Control: View>(
@@ -105,16 +102,19 @@ struct HomeView: View {
         }
     }
 
-    private var controls: some View {
-        VStack(alignment: .trailing, spacing: 10) {
-            HStack(spacing: 10) {
-                Text("FEEDBACK")
-                    .font(.system(size: 13, weight: .semibold))
-                    .tracking(0.65)
-                    .opacity(0.7)
-                SegmentedPicker(options: [(true, "On"), (false, "Off")], selection: $feedback)
-            }
-            SegmentedPicker(options: ThemePreference.allCases.map { ($0, $0.label) }, selection: $theme)
+    /// Styled and placed like the pause button in a game.
+    private var settingsButton: some View {
+        Button {
+            isShowingSettings.toggle()
+        } label: {
+            Label("Settings", systemImage: "gearshape")
+                .labelStyle(.iconOnly)
+        }
+        .buttonStyle(OutlineButtonStyle(
+            fontSize: 14, paddingV: 5, paddingH: 10, cornerRadius: 6, restingOpacity: 0.5))
+        .help("Settings")
+        .popover(isPresented: $isShowingSettings, arrowEdge: .bottom) {
+            SettingsPanel()
         }
     }
 
@@ -153,6 +153,38 @@ struct HomeView: View {
         // In the web version, clicking Start blurred the field first, committing it.
         if focus == .trials { commitTrials() }
         onStart()
+    }
+}
+
+/// Feedback and the theme, in the popover from the settings button.
+private struct SettingsPanel: View {
+    @AppStorage(SettingsKey.feedback) private var feedback = true
+    @AppStorage(SettingsKey.theme) private var theme = ThemePreference.system
+
+    var body: some View {
+        Grid(alignment: .leading, horizontalSpacing: 16, verticalSpacing: 12) {
+            GridRow {
+                label("FEEDBACK")
+                SegmentedPicker(options: [(true, "On"), (false, "Off")], selection: $feedback)
+            }
+            GridRow {
+                label("THEME")
+                SegmentedPicker(options: ThemePreference.allCases.map { ($0, $0.label) }, selection: $theme)
+            }
+        }
+        .padding(20)
+        .foregroundStyle(Palette.foreground)
+        // Opaque, because the popover can hang past the window's edge, and glass there would
+        // take on whatever window is beside it.
+        .presentationBackground(Palette.background)
+        .onChange(of: theme) { _, theme in theme.apply() }
+    }
+
+    private func label(_ text: LocalizedStringKey) -> some View {
+        Text(text)
+            .font(.system(size: 13, weight: .semibold))
+            .tracking(0.65)
+            .opacity(0.7)
     }
 }
 

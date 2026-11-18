@@ -16,9 +16,9 @@ Every 3 seconds a trial presents two stimuli at once: a position (one of the 8 o
 | Pause or resume | `Esc` | Pause button |
 | Leave the results | `Esc` | Return Home |
 
-Settings are on the home screen and persist in UserDefaults: n-back level, trial count, feedback, and theme (Auto, Light, Dark). With feedback on, a pressed match button turns green or red by correctness and a live score shows during the game. With it off, the button turns blue and the score stays hidden until the end.
+Settings persist in UserDefaults. The n-back level and trial count are on the home screen. Feedback and the theme (Auto, Light, Dark) are in a popover from the gear button in its top-right corner. With feedback on, a pressed match button turns green or red by correctness and a live score shows during the game. With it off, the button turns blue and the score stays hidden until the end.
 
-Rules, timing, scoring, and layout match the web version, down to how JavaScript rounded percentages. The deliberate differences: the system font replaces Inter, the trial count accepts whole numbers only, a mouse click on the grid counts as a position match (the web version counted only taps there), and clicking the pause button no longer also registers a position response.
+Rules, timing, scoring, and layout match the web version, down to how JavaScript rounded percentages. The deliberate differences: the system font replaces Inter, feedback and the theme moved from the home screen's corner into the gear's popover, the trial count accepts whole numbers only, a mouse click on the grid counts as a position match (the web version counted only taps there), and clicking the pause button no longer also registers a position response.
 
 ## Commands
 
@@ -52,7 +52,7 @@ Last verified 2026-11-18 on macOS 26.5 with Xcode 26.2.
 - `NBack/Scoring.swift`: confusion matrices, scores, and number and time formatting. Each modality scores `TP / (TP + FP + FN)`, so correct rejections do not count, and the headline score is the mean of the two.
 - `NBack/SoundBank.swift`: the eight letter sounds in `NBack/Sounds/`, loaded once with `AVAudioPlayer`.
 - `NBack/Settings.swift`: UserDefaults keys, the settings a game starts with, and the theme.
-- `NBack/HomeView.swift`, `NBack/GameView.swift`, `NBack/ResultsView.swift`: the three screens. `NBack/ClickCatcher.swift` reports raw mouse-downs to the board.
+- `NBack/HomeView.swift`, `NBack/GameView.swift`, `NBack/ResultsView.swift`: the three screens. The settings popover is `SettingsPanel` in `HomeView.swift`. `NBack/ClickCatcher.swift` reports raw mouse-downs to the board.
 - `NBack/Style.swift`: the palette, the outlined button, the segmented picker, and the scale-to-fit helper.
 - Sizes are points equal to the web version's CSS pixels, so `1.8rem` became `18`.
 - The Xcode project uses a synchronized folder, so any file added under `NBack/` joins the target with no project edits.
